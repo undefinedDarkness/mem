@@ -1,7 +1,7 @@
 'use client'
 import { RichTreeView, TreeItem2, TreeItem2Label, TreeViewBaseItem } from '@mui/x-tree-view'
 import { get } from 'idb-keyval'
-import { Workspace } from '../setup/page'
+import { Workspace } from "../db"
 import { useState, useEffect, ReactNode, ReactElement, ElementType } from 'react'
 import { DocumentIcon, DocumentTextIcon, FolderOpenIcon, FolderIcon, PresentationChartBarIcon, XMarkIcon } from '@heroicons/react/16/solid'
 import { AlertDialog, Button, Flex } from '@radix-ui/themes'
@@ -42,7 +42,7 @@ function CustomTreeItem({ itemId, label,  ...props }: { itemId: string, label: s
         'unknown': undefined
     }
     const newURL = new URL(window.location.href);
-    newURL.searchParams.set('tryOpenFile', itemId);
+    newURL.searchParams.set('documentWorkspacePath', itemId);
     const treeLabel = () => <TreeItem2Label><Link className='whitespace-nowrap' href={newURL}>{label}</Link></TreeItem2Label>
 
     return <TreeItem2 className='[&_.MuiTreeItem-label]:!font-sans' slots={{ icon: iconMap[extension], label: treeLabel }} itemId={itemId} {...props}>
