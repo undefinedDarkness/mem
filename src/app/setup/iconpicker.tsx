@@ -4,14 +4,14 @@ import { Flex, Grid, Heading, IconButton, Popover } from "@radix-ui/themes";
 import { PossibleIcons, lookupIcon } from "heroicons-lookup";
 import { useMemo, useState } from "react";
 
-export function IconPicker() {
+export function IconPicker({ ...props }) {
     const [chosenIcon, setChosenIcon] = useState<PossibleIcons>(`HomeIcon`);
     const chosenIconComponent = useMemo(() => {
         const Icon = lookupIcon(chosenIcon, 'mini');
         return <Icon className="size-5"></Icon>;
     }, [chosenIcon]);
     return <>
-        <input type="text" name="workspaceIcon" value={chosenIcon} hidden readOnly />
+        <input {...props} type="text"  value={chosenIcon} hidden readOnly />
         <Popover.Root>
             <Popover.Trigger>
                 <IconButton className="cursor-pointer">

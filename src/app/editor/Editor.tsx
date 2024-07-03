@@ -1,14 +1,16 @@
 'use client'
 
 // @deno-types="npm:tldraw"
-import { Tldraw, Editor, TLUiOverrides, TLUiComponents, TLEditorComponents, useTools, DefaultToolbar, TldrawUiMenuItem, useIsToolSelected, DefaultToolbarContent, createShapeId } from "tldraw";
+import { Tldraw, Editor, TLUiOverrides, TLUiComponents, TLEditorComponents, useTools, DefaultToolbar, TldrawUiMenuItem, useIsToolSelected, DefaultToolbarContent, createShapeId, useEditor } from "tldraw";
 import { useCallback, useState, useEffect } from 'react'
 import { createAssetFromUrl } from "./createAssetFromUrl";
 import { handleDropEvents } from "./handleDropEvents";
 import 'tldraw/tldraw.css'
 import { PageBookmarkTool, PageBookmarkUtil } from "./bookmarkShape";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { zoomToShape } from "../sidebar/bookmarks";
+import { InternalLinkUtil } from "./internalLink";
+import { useRouter } from "next/navigation";
 
 
 const overrides: TLUiOverrides = {
@@ -38,40 +40,44 @@ const components: TLUiComponents & TLEditorComponents = {
     )
   },
 }
-export default function CanvasEditor({ setEditor, ...props }: { setEditor: React.Dispatch<React.SetStateAction<Editor | undefined>> }) {
+
+function QueryState() {
+  const editor = useEditor()
   const params = useSearchParams()
-  
-  const onMount = useCallback((editor: Editor) => {
-    (window as any).editor = editor
+  const router = useRouter()
+  const pathname = usePathname()
+
+  useEffect(() => {
+    const shapeId = params.get('zoomToShape')
+    if (shapeId) {
+      zoomToShape(editor, createShapeId(shapeId))
+      router.push(pathname) // TODO Find a better way to do this
+    }
+  }, [params])
+
+  return <></>
+}
+export default function CanvasEditor({ workspaceId, setEditor, ...props }: { workspaceId: string, setEditor: React.Dispatch<React.SetStateAction<Editor | undefined>> }) {
+
+  const onMount = (editor: Editor) => {
     editor.registerExternalAssetHandler('url', createAssetFromUrl)
 
     // @ts-ignore
-    const defaultFileHandler = editor.externalContentHandlers['files']
-    editor.registerExternalContentHandler('files', async content => {
-      console.log(content)
-      await defaultFileHandler?.(content)
-    })
+    // const defaultFileHandler = editor.externalContentHandlers['files']
+    // editor.registerExternalContentHandler('files', async content => {
+    //   console.log(content)
+    //   await defaultFileHandler?.(content)
+    // })
 
     const fn = (ev: DragEvent) => handleDropEvents(ev, editor)
     editor.getContainer().addEventListener('drop', fn)
     setEditor(editor)
-
-    if (params.get('zoomToShape')) {
-      try { zoomToShape(editor, createShapeId(params.get('zoomToShape')!)) }
-      catch (err) {
-        console.warn(`Failed to zoom to shape: ${err}`)
-      }
-    }
-
-    return () => {
-      setEditor(undefined)
-      editor.getContainer().removeEventListener('drop', fn)
-    }
-  }, [])
+  }
 
   return (
     <>
-      <Tldraw tools={[PageBookmarkTool]} components={components} overrides={overrides} shapeUtils={[PageBookmarkUtil]} {...props} onMount={onMount} inferDarkMode={true} persistenceKey="nes">
+      <Tldraw tools={[PageBookmarkTool]} components={components} overrides={overrides} shapeUtils={[PageBookmarkUtil, InternalLinkUtil]} {...props} onMount={onMount} inferDarkMode={true} persistenceKey={workspaceId}>
+        <QueryState />
       </Tldraw>
     </>
   );

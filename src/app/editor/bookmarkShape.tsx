@@ -16,7 +16,7 @@ import {
 import { nanoid } from 'nanoid'
 import { update } from 'idb-keyval'
 import { BookmarkIcon } from '@heroicons/react/16/solid'
-import { Button, Flex, Text, TextField } from '@radix-ui/themes'
+import { Button, Flex, Text, TextField, } from '@radix-ui/themes'
 import { KeyboardEventHandler } from 'react'
 
 export type IPageBookmarkShape = TLBaseShape<
@@ -75,10 +75,13 @@ export class PageBookmarkUtil extends ShapeUtil<IPageBookmarkShape> {
             }
         }
 
-        return <HTMLContainer onPointerDown={isEditing ? stopEventPropagation : undefined} style={{ pointerEvents: isEditing ? 'all' : 'none' }} className='rounded-md bg-zinc-800 p-2 font-sans'>
+        return <HTMLContainer className='rounded-md bg-zinc-800 p-2 font-sans'>
             <Flex gap="2">
-                <BookmarkIcon className='text-blue-500 size-4'></BookmarkIcon> 
-                { isEditing ? <TextField.Root placeholder={shape.props.text} onKeyDown={handleKeyDown}></TextField.Root> : <Text>{shape.props.text}</Text> }
+                <BookmarkIcon className='text-blue-500 size-4'></BookmarkIcon>
+                {isEditing ? <TextField.Root onPointerDown={e => e.stopPropagation()} style={{
+                    pointerEvents:
+                        'all'
+                }} placeholder={shape.props.text} onKeyDown={handleKeyDown}></TextField.Root> : <Text>{shape.props.text}</Text>}
             </Flex>
         </HTMLContainer>
     }

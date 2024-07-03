@@ -3,7 +3,7 @@ import { LinkInsert } from "../sidebar/bookmarks"
 
 export const handleDropEvents = (ev: DragEvent, editor: Editor) => {
 
-  const eventPoint = editor.pageToScreen({ x: ev.clientX, y: ev.clientY })
+  const eventPoint = editor.screenToPage({ x: ev.clientX, y: ev.clientY })
 
   console.log(`[editor] got dropped on!`)
   console.log(ev.dataTransfer)
@@ -50,11 +50,12 @@ export const handleDropEvents = (ev: DragEvent, editor: Editor) => {
       ev.stopImmediatePropagation()
       const data: LinkInsert = JSON.parse(link)
       editor.createShape({
-        type: 'text',
+        type: 'internal-link-shape',
         x: eventPoint.x,
         y: eventPoint.y,
         props: {
-          text: data.url
+          url: data.url,
+          text: data.name
         }
       })
     }

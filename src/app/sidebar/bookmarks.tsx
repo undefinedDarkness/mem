@@ -1,10 +1,12 @@
 'use client'
-import { Box, Flex, Text } from "@radix-ui/themes"
+import { Box, Flex, Text, Link as RadixLink } from "@radix-ui/themes"
 import { Editor, TLParentId, TLShapeId, createShapeId } from "tldraw"
 import { ReactNode, useCallback, useEffect, useState } from "react"
 import { get } from "idb-keyval"
 import { IPageBookmarkShape, PageBookmarkUtil } from "../editor/bookmarkShape"
 import { nanoid } from "nanoid"
+import Link from "next/link"
+
 
 export function zoomToShape(editor: Editor, shapeId: TLShapeId) {
     const all = editor.getSelectedShapeIds()
@@ -22,7 +24,8 @@ export function zoomToShape(editor: Editor, shapeId: TLShapeId) {
 export interface LinkInsert {
     workspaceId: string,
     url: string
-    kind: 'bookmark'
+    kind: 'bookmark',
+    name: string
 }
 
 export default function Bookmarks({ editor, workspaceId }: { editor: Editor | undefined, workspaceId: string }) {
@@ -43,17 +46,17 @@ export default function Bookmarks({ editor, workspaceId }: { editor: Editor | un
                 // TODO: Clear out invalid bookmarks from IDB
                 const bookmarkText = bookmark?.props.text
                 const pt = editor.pageToScreen({ x: bookmark.x, y: bookmark.y })
-                // console.log(pt)
+                const bookmarkUrl = new URL(window.location.href)
+                bookmarkUrl.searchParams.set('zoomToShape', id)
                 bookmarksEl.push(
-                    <Box key={id} onClick={() => {
-                        zoomToShape(editor, shapeId)
-                    }} draggable onDragStart={(ev) => {
+                    <Link key={id} draggable href={bookmarkUrl} onDragStart={(ev) => {
                         ev.dataTransfer.setData('custom/link-insert', JSON.stringify({
-                            url: `${window.location.href}?zoomToShape=${id}`,
+                            url: bookmarkUrl.toString(),
                             workspaceId: workspaceId,
-                            kind: 'bookmark'
-                        }))
-                    }}><Text>{bookmarkText}</Text></Box>
+                            kind: 'bookmark',
+                            name: bookmarkText
+                        } as LinkInsert))
+                    }}><RadixLink>{bookmarkText}</RadixLink></Link>
                 )
                 //setBookmarks(prev => [...prev, <Text key={id}>{i}</Text>])
             }
