@@ -60,7 +60,7 @@ export default function Home() {
   return (
     <main>
       <LayoutContainer layout="sidepanel" mainCanvas={<CanvasEditor workspaceId={workspaceId} setEditor={setEditor}></CanvasEditor>} sideBar={<Sidebar workspaceId={workspaceId!} editor={editor}></Sidebar>}></LayoutContainer>
-      <Toaster></Toaster>
+      <Toaster position="bottom-right"></Toaster>
     </main>
   );
 }

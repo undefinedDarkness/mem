@@ -126,7 +126,7 @@ export default function Files({ workspaceId }: { workspaceId: string }) {
             <input {...getInputProps()} />
             <Box className='border-dashed mb-4 rounded-md border-4 flex justify-center items-center p-6'>
                 <CloudArrowDownIcon className='size-5 mx-auto'></CloudArrowDownIcon>
-                <Text size="2" className='font-bold'>Drop Here To Import!</Text>
+                <Text size="2" className='font-bold block text-center'>Drop Here To Import!</Text>
             </Box>
         </div>
         <AlertDialog.Root open={wantPermissionFor != undefined}>
