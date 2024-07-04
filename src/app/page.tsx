@@ -5,7 +5,7 @@ import { Sidebar } from "./sidebar/sidebar";
 import Cookies from "js-cookie";
 import { Editor } from "tldraw";
 import { useEffect, useState } from "react";
-import { get } from "idb-keyval";
+import { get, update } from "idb-keyval";
 import { Workspace } from "./utils/db";
 import { useRouter } from "next/navigation";
 import { Toaster } from "react-hot-toast";
@@ -37,19 +37,23 @@ export default function Home() {
   })
 
   useEffect(() => {
-    // console.log(`wtf`)
-    const id = setInterval(() => {
+    let id: number;
+    const updateMath = () => {
+      // TODO: Try optimizing this further!
       console.log(`[math] Updated expressions`)
-      renderMathInElement(document.body, {
+      document.querySelectorAll('div.tl-text-content').forEach(el => renderMathInElement(el as HTMLElement, {
         displayMode: false,
         delimiters: [
           {left: "\\(", right: "\\)", display: false},
         ]
-      })
-    }, 30000)
+      }))
+      id = requestIdleCallback(updateMath, {timeout: 30000}) 
+    }
+    updateMath();
+    // console.log(`wtf`)
 
     return () => {
-      clearInterval(id)
+      cancelIdleCallback(id)
     }
   }, [  ])
 
