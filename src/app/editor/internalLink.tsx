@@ -15,10 +15,11 @@ import {
 } from 'tldraw'
 import { nanoid } from 'nanoid'
 import { update } from 'idb-keyval'
-import { ArrowRightIcon, BookmarkIcon } from '@heroicons/react/16/solid'
-import { Button, Flex, Text, TextField, Link as RadixLink } from '@radix-ui/themes'
+import { ArrowRightIcon, BookmarkIcon, DocumentTextIcon, PaperClipIcon } from '@heroicons/react/16/solid'
+import { Button, Flex, Text, TextField } from '@radix-ui/themes'
 import { KeyboardEventHandler } from 'react'
 import Link from 'next/link'
+import { LinkInsert } from '../sidebar/bookmarks'
 
 export type IInternalLink = TLBaseShape<
     'internal-link-shape',
@@ -27,6 +28,7 @@ export type IInternalLink = TLBaseShape<
         h: number,
         url: string,
         text: string,
+        kind: string
     }
 >
 
@@ -36,15 +38,17 @@ export class InternalLinkUtil extends ShapeUtil<IInternalLink> {
         url: T.string,
         w: T.number,
         h: T.number,
-        text: T.string
+        text: T.string,
+        kind: T.string
     }
 
     getDefaultProps(): IInternalLink['props'] {
         return {
             url: 'https://example.com',
             w: 250,
-            h: 100,
-            text: 'example.com'
+            h: 50,
+            text: 'example.com',
+            kind: 'web'
         }
     }
 
@@ -65,10 +69,18 @@ export class InternalLinkUtil extends ShapeUtil<IInternalLink> {
     }
 
     component(shape: IInternalLink) {
+
+        const Icon = ({
+            'web': PaperClipIcon,
+            'bookmark': BookmarkIcon,
+            'document': DocumentTextIcon
+        }[shape.props.kind] ?? PaperClipIcon)
+
         return <HTMLContainer className='rounded-md bg-zinc-800 p-3 font-sans'>
-            <Flex gap="4">
-                <ArrowRightIcon className='size-5'></ArrowRightIcon>
-                <Link onPointerDown={_ => _.stopPropagation()} style={{pointerEvents: 'all'}} href={shape.props.url}><RadixLink>{shape.props.text}</RadixLink></Link>
+            <Flex gap="4" align={"center"}>
+                <ArrowRightIcon className='size-5 text-zinc-500'></ArrowRightIcon>
+                <Icon className='size-5'></Icon>
+                <Link onPointerDown={_ => _.stopPropagation()} style={{pointerEvents: 'all'}} href={shape.props.url}>{shape.props.text}</Link>
             </Flex>
         </HTMLContainer>
     }

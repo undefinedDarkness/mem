@@ -55,7 +55,8 @@ export const handleDropEvents = (ev: DragEvent, editor: Editor) => {
         y: eventPoint.y,
         props: {
           url: data.url,
-          text: data.name
+          text: data.name,
+          kind: data.kind
         }
       })
     }

@@ -9,15 +9,8 @@ import { useState, useEffect } from "react";
 import { DirectoryPicker } from "./directorypicker";
 import Cookies from 'js-cookie'
 import { nanoid } from "nanoid";
+import { Workspace } from "../utils/db";
 
-
-export interface Workspace {
-    id: string,
-    icon: string,
-    directoryId: string,
-    directoryPath: string,
-    name: string
-}
 
 export default function Setup() {
 

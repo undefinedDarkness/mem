@@ -1,5 +1,5 @@
 'use client'
-import { Box, Flex, Text, Link as RadixLink } from "@radix-ui/themes"
+import { Box, Flex, Text } from "@radix-ui/themes"
 import { Editor, TLParentId, TLShapeId, createShapeId } from "tldraw"
 import { ReactNode, useCallback, useEffect, useState } from "react"
 import { get } from "idb-keyval"
@@ -22,9 +22,9 @@ export function zoomToShape(editor: Editor, shapeId: TLShapeId) {
 }
 
 export interface LinkInsert {
-    workspaceId: string,
+    workspaceId?: string,
     url: string
-    kind: 'bookmark',
+    kind: 'bookmark' | 'document' | 'web',
     name: string
 }
 
@@ -56,7 +56,7 @@ export default function Bookmarks({ editor, workspaceId }: { editor: Editor | un
                             kind: 'bookmark',
                             name: bookmarkText
                         } as LinkInsert))
-                    }}><RadixLink>{bookmarkText}</RadixLink></Link>
+                    }}>{bookmarkText}</Link>
                 )
                 //setBookmarks(prev => [...prev, <Text key={id}>{i}</Text>])
             }

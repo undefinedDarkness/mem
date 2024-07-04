@@ -1,11 +1,13 @@
 'use client'
 import { RichTreeView, TreeItem2, TreeItem2Label, TreeViewBaseItem } from '@mui/x-tree-view'
 import { get } from 'idb-keyval'
-import { Workspace } from "../db"
-import { useState, useEffect, ReactNode, ReactElement, ElementType } from 'react'
-import { DocumentIcon, DocumentTextIcon, FolderOpenIcon, FolderIcon, PresentationChartBarIcon, XMarkIcon } from '@heroicons/react/16/solid'
-import { AlertDialog, Button, Flex } from '@radix-ui/themes'
+import { Workspace, getWorkspaceDirectory } from "../utils/db"
+import { useState, useEffect, ReactNode, ReactElement, ElementType, useCallback } from 'react'
+import { DocumentIcon, DocumentTextIcon, FolderOpenIcon, FolderIcon, PresentationChartBarIcon, XMarkIcon, CloudArrowDownIcon } from '@heroicons/react/16/solid'
+import { AlertDialog, Box, Button, Flex, Text } from '@radix-ui/themes'
 import Link from 'next/link'
+import { useDropzone } from 'react-dropzone'
+import { CheckmarkIcon, toast, ErrorIcon } from 'react-hot-toast'
 
 async function walkDirectory(dir: FileSystemDirectoryHandle, stem: string = '') {
 
@@ -15,7 +17,7 @@ async function walkDirectory(dir: FileSystemDirectoryHandle, stem: string = '') 
             result.push({
                 id: `${stem}/${entry.name}`,
                 label: entry.name,
-                children: []
+                children: [],
             })
         } else {
             result.push({
@@ -29,7 +31,7 @@ async function walkDirectory(dir: FileSystemDirectoryHandle, stem: string = '') 
     return result
 }
 
-function CustomTreeItem({ itemId, label,  ...props }: { itemId: string, label: string }) {
+function CustomTreeItem({ itemId, label, ...props }: { itemId: string, label: string }) {
     let icon: ElementType<any, keyof JSX.IntrinsicElements> | undefined;
     const extension = itemId.split('.').pop() ?? 'unknown';
 
@@ -41,9 +43,19 @@ function CustomTreeItem({ itemId, label,  ...props }: { itemId: string, label: s
         'docx': DocumentTextIcon,
         'unknown': undefined
     }
-    const newURL = new URL(window.location.href);
-    newURL.searchParams.set('documentWorkspacePath', itemId);
-    const treeLabel = () => <TreeItem2Label><Link className='whitespace-nowrap' href={newURL}>{label}</Link></TreeItem2Label>
+
+    let onDragStart = null
+    let treeLabel: ElementType<any, keyof JSX.IntrinsicElements> = () => <TreeItem2Label>{label}</TreeItem2Label>
+    if (extension == 'pdf') {
+        const newURL = new URL(window.location.href);
+        newURL.searchParams.set('documentWorkspacePath', itemId);
+        newURL.searchParams.set('sidebarCurrentActiveTab', 'document')
+        treeLabel = () => <TreeItem2Label><Link className='whitespace-nowrap' href={newURL}>{label}</Link></TreeItem2Label>
+    } else {
+        onDragStart = (ev) => {
+
+        }
+    }
 
     return <TreeItem2 className='[&_.MuiTreeItem-label]:!font-sans' slots={{ icon: iconMap[extension], label: treeLabel }} itemId={itemId} {...props}>
     </TreeItem2>
@@ -89,7 +101,34 @@ export default function Files({ workspaceId }: { workspaceId: string }) {
         }
     }, [workspaceId]);
 
-    return <>
+    const onDrop = (files: File[]) => {
+        getWorkspaceDirectory().then(dir => {
+            for (const file of files) {
+                if (!dir?.handle) return
+                toast.promise(dir.handle.getFileHandle(file.name, { create: true }).then(fileHandle => {
+                    fileHandle.createWritable().then(writer => {
+                        writer.write(file)
+                        writer.close()
+                    })
+                }), {
+                    loading: `Copying ${file.name}...`,
+                    success: <Text>Successfully Copied {file.name}</Text>,
+                    error: (err: Error) => <Text>Encountered error while copying {file.name}, {err.toString()}</Text>
+                })
+            }
+        })
+    }
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+
+    return <section >
+        <div {...getRootProps()}>
+            <input {...getInputProps()} />
+            <Box className='border-dashed mb-4 rounded-md border-4 flex justify-center items-center p-6'>
+                <CloudArrowDownIcon className='size-5 mx-auto'></CloudArrowDownIcon>
+                <Text size="2" className='font-bold'>Drop Here To Import!</Text>
+            </Box>
+        </div>
         <AlertDialog.Root open={wantPermissionFor != undefined}>
             <AlertDialog.Content>
                 <AlertDialog.Title>Need permission to be granted</AlertDialog.Title>
@@ -113,9 +152,10 @@ export default function Files({ workspaceId }: { workspaceId: string }) {
             </AlertDialog.Content>
         </AlertDialog.Root>
         <RichTreeView disableSelection items={treeItems} slots={{
+            // @ts-ignore 
             item: CustomTreeItem,
             collapseIcon: () => <FolderOpenIcon className="text-yellow-500"></FolderOpenIcon>,
             expandIcon: () => <FolderIcon className="text-yellow-500"></FolderIcon>
-        }}></RichTreeView>
-    </>
+        }} className='overflow-y-auto h-[100vh]'></RichTreeView>
+    </section>
 }

@@ -11,6 +11,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { zoomToShape } from "../sidebar/bookmarks";
 import { InternalLinkUtil } from "./internalLink";
 import { useRouter } from "next/navigation";
+import { clearUrlParam } from "../utils/utils";
 
 
 const overrides: TLUiOverrides = {
@@ -45,13 +46,12 @@ function QueryState() {
   const editor = useEditor()
   const params = useSearchParams()
   const router = useRouter()
-  const pathname = usePathname()
 
   useEffect(() => {
     const shapeId = params.get('zoomToShape')
     if (shapeId) {
       zoomToShape(editor, createShapeId(shapeId))
-      router.push(pathname) // TODO Find a better way to do this
+      clearUrlParam('zoomToShape', router)
     }
   }, [params])
 
