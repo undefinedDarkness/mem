@@ -6,6 +6,7 @@ import { get } from "idb-keyval"
 import { IPageBookmarkShape, PageBookmarkUtil } from "../editor/bookmarkShape"
 import { nanoid } from "nanoid"
 import Link from "next/link"
+import { FullLink } from "../utils/tinycomponents"
 
 
 export function zoomToShape(editor: Editor, shapeId: TLShapeId) {
@@ -45,18 +46,21 @@ export default function Bookmarks({ editor, workspaceId }: { editor: Editor | un
                 if (!bookmark) continue
                 // TODO: Clear out invalid bookmarks from IDB
                 const bookmarkText = bookmark?.props.text
+                const bookmarkPage = editor.getAncestorPageId(shapeId)
+                if (!bookmarkPage) continue;
                 const pt = editor.pageToScreen({ x: bookmark.x, y: bookmark.y })
                 const bookmarkUrl = new URL(window.location.href)
                 bookmarkUrl.searchParams.set('zoomToShape', id)
+                bookmarkUrl.searchParams.set('canvasPage', bookmarkPage)
                 bookmarksEl.push(
-                    <Link key={id} draggable href={bookmarkUrl} onDragStart={(ev) => {
-                        ev.dataTransfer.setData('custom/link-insert', JSON.stringify({
+                    <FullLink key={id} draggable href={bookmarkUrl.href} onDragStart={(ev) => {
+                        ev.dataTransfer?.setData('custom/link-insert', JSON.stringify({
                             url: bookmarkUrl.toString(),
                             workspaceId: workspaceId,
                             kind: 'bookmark',
                             name: bookmarkText
                         } as LinkInsert))
-                    }}>{bookmarkText}</Link>
+                    }}>{bookmarkText}</FullLink>
                 )
                 //setBookmarks(prev => [...prev, <Text key={id}>{i}</Text>])
             }

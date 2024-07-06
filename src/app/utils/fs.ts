@@ -1,3 +1,7 @@
+import { Editor } from 'tldraw';
+import { getWorkspaceDirectory } from './db'
+import toast from 'react-hot-toast';
+
 export async function getFileHandleFromPath(path: string, dir: FileSystemDirectoryHandle) {
     try {
       // Get the root directory handle
@@ -23,5 +27,40 @@ export async function getFileHandleFromPath(path: string, dir: FileSystemDirecto
     } catch (error) {
       console.error('Error opening file:', error);
       throw error;
+    }
+  }
+
+  export function toReadableStream(str: any) {
+    return new ReadableStream({
+      start: (controller) => {
+        controller.enqueue(str);
+        controller.close();
+      }
+    })
+  }
+
+export async function saveToFilesystem(editor: Editor) {
+    const dir = await getWorkspaceDirectory();
+    const fileHandle = await dir?.handle?.getFileHandle('Drawing.tldraw', { create: true });
+
+    if (fileHandle) {
+      // TODO: Attempt offloading
+      const writable = await fileHandle.createWritable();
+      const snapshot = JSON.stringify(editor.getSnapshot());
+      toast.promise(
+        toReadableStream(snapshot)
+          .pipeThrough(new TextEncoderStream())
+          .pipeThrough(new CompressionStream('gzip'))
+          .pipeTo(writable),
+        {
+          loading: 'Saving...',
+          success: `Saved`,
+          error: (err: Error) => {
+            console.error(err);
+            return `Encountered error while saving, ${err.toString()}`;
+          }
+        });
+    } else {
+      // toast.error("Failed to get file handle to Drawing.tldraw in works")
     }
   }

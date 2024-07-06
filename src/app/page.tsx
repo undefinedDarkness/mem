@@ -3,7 +3,7 @@ import CanvasEditor from "./editor/Editor";
 import { LayoutContainer } from "./dashboard/layoutcontainer";
 import { Sidebar } from "./sidebar/sidebar";
 import Cookies from "js-cookie";
-import { Editor } from "tldraw";
+import { debounce, Editor } from "tldraw";
 import { useEffect, useState } from "react";
 import { get, update } from "idb-keyval";
 import { Workspace } from "./utils/db";
@@ -37,7 +37,6 @@ export default function Home() {
   })
 
   useEffect(() => {
-    let id: number;
     const updateMath = () => {
       // TODO: Try optimizing this further!
       console.log(`[math] Updated expressions`)
@@ -47,20 +46,20 @@ export default function Home() {
           {left: "\\(", right: "\\)", display: false},
         ]
       }))
-      id = requestIdleCallback(updateMath, {timeout: 30000}) 
     }
-    updateMath();
+
+    const id = setInterval(updateMath, 10_000) 
     // console.log(`wtf`)
 
     return () => {
-      cancelIdleCallback(id)
+      clearInterval(id)
     }
   }, [  ])
 
   return (
     <main>
       <LayoutContainer layout="sidepanel" mainCanvas={<CanvasEditor workspaceId={workspaceId} setEditor={setEditor}></CanvasEditor>} sideBar={<Sidebar workspaceId={workspaceId!} editor={editor}></Sidebar>}></LayoutContainer>
-      <Toaster position="bottom-right"></Toaster>
+      <Toaster position="bottom-left"></Toaster>
     </main>
   );
 }

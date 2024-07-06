@@ -1,17 +1,16 @@
 'use client'
-
-// @deno-types="npm:tldraw"
-import { Tldraw, Editor, TLUiOverrides, TLUiComponents, TLEditorComponents, useTools, DefaultToolbar, TldrawUiMenuItem, useIsToolSelected, DefaultToolbarContent, createShapeId, useEditor } from "tldraw";
-import { useCallback, useState, useEffect } from 'react'
+import { debounce, Tldraw, Editor, TLUiOverrides, TLUiComponents, TLEditorComponents, useTools, DefaultToolbar, TldrawUiMenuItem, useIsToolSelected, DefaultToolbarContent, createShapeId, useEditor, TLPageId } from "tldraw";
+import { useEffect } from 'react'
 import { createAssetFromUrl } from "./createAssetFromUrl";
 import { handleDropEvents } from "./handleDropEvents";
 import 'tldraw/tldraw.css'
 import { PageBookmarkTool, PageBookmarkUtil } from "./bookmarkShape";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { zoomToShape } from "../sidebar/bookmarks";
 import { InternalLinkUtil } from "./internalLink";
 import { useRouter } from "next/navigation";
 import { clearUrlParam } from "../utils/utils";
+import { saveToFilesystem } from "../utils/fs";
 
 
 const overrides: TLUiOverrides = {
@@ -53,21 +52,43 @@ function QueryState() {
       zoomToShape(editor, createShapeId(shapeId))
       clearUrlParam('zoomToShape', router)
     }
+
+    const canvasPage = params.get('canvasPage')
+    if (canvasPage) {
+      editor.setCurrentPage(canvasPage as TLPageId)
+    }
   }, [params])
 
   return <></>
 }
+
+function SaveStateLocally() {
+  const editor = useEditor()
+
+  useEffect(() => {
+    const onVisibilityChanged = async () => {
+      if (document.visibilityState != "hidden") return
+      await saveToFilesystem(editor);
+    }
+
+    document.addEventListener('visibilitychange', onVisibilityChanged);
+    // const id = setInterval(_ => saveToFilesystem(editor), 10_000);
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChanged)
+      // clearInterval(id)
+    }
+  }, [editor])
+
+  return <></>
+
+ 
+}
+
 export default function CanvasEditor({ workspaceId, setEditor, ...props }: { workspaceId: string, setEditor: React.Dispatch<React.SetStateAction<Editor | undefined>> }) {
 
   const onMount = (editor: Editor) => {
     editor.registerExternalAssetHandler('url', createAssetFromUrl)
-
-    // @ts-ignore
-    // const defaultFileHandler = editor.externalContentHandlers['files']
-    // editor.registerExternalContentHandler('files', async content => {
-    //   console.log(content)
-    //   await defaultFileHandler?.(content)
-    // })
 
     const fn = (ev: DragEvent) => handleDropEvents(ev, editor)
     editor.getContainer().addEventListener('drop', fn)
@@ -78,6 +99,7 @@ export default function CanvasEditor({ workspaceId, setEditor, ...props }: { wor
     <>
       <Tldraw tools={[PageBookmarkTool]} components={components} overrides={overrides} shapeUtils={[PageBookmarkUtil, InternalLinkUtil]} {...props} onMount={onMount} inferDarkMode={true} persistenceKey={workspaceId}>
         <QueryState />
+        <SaveStateLocally />
       </Tldraw>
     </>
   );
