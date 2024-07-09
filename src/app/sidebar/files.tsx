@@ -4,7 +4,7 @@ import { get } from 'idb-keyval'
 import { Workspace, getWorkspaceDirectory } from "../utils/db"
 import { useState, useEffect, ReactNode, ReactElement, ElementType, useCallback } from 'react'
 import { DocumentIcon, DocumentTextIcon, FolderOpenIcon, FolderIcon, PresentationChartBarIcon, XMarkIcon, CloudArrowDownIcon } from '@heroicons/react/16/solid'
-import { AlertDialog, Box, Button, Flex, Text } from '@radix-ui/themes'
+import { AlertDialog, Box, Button, Flex, Separator, Text } from '@radix-ui/themes'
 import Link from 'next/link'
 import { useDropzone } from 'react-dropzone'
 import { CheckmarkIcon, toast, ErrorIcon } from 'react-hot-toast'
@@ -52,9 +52,9 @@ function CustomTreeItem({ itemId, label, ...props }: { itemId: string, label: st
         newURL.searchParams.set('sidebarCurrentActiveTab', 'document')
         treeLabel = () => <TreeItem2Label><Link className='whitespace-nowrap' href={newURL}>{label}</Link></TreeItem2Label>
     } else {
-        onDragStart = (ev) => {
+        // onDragStart = (ev) => {
 
-        }
+        // }
     }
 
     return <TreeItem2 className='[&_.MuiTreeItem-label]:!font-sans' slots={{ icon: iconMap[extension], label: treeLabel }} itemId={itemId} {...props}>

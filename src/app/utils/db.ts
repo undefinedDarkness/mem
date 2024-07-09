@@ -25,7 +25,7 @@ export interface Workspace {
 }
 
 
-export async function getCurrentWorkspace(): Promise<string> {
+export async function getCurrentWorkspaceId(): Promise<string> {
     const cookieId = Cookies.get('currentWorkspaceId')
     if (cookieId)
         return (cookieId)
@@ -43,7 +43,7 @@ export async function getCurrentWorkspace(): Promise<string> {
 }
 
 export async function getWorkspace(id?: string) {
-    id = id ?? await getCurrentWorkspace()
+    id = id ?? await getCurrentWorkspaceId()
     return (await get<Workspace>(id))
 }
 
