@@ -3,10 +3,11 @@ import { Box, Flex, Text } from "@radix-ui/themes"
 import { Editor, TLParentId, TLShapeId, createShapeId } from "tldraw"
 import { ReactNode, useCallback, useEffect, useState } from "react"
 import { get } from "idb-keyval"
-import { IPageBookmarkShape, PageBookmarkUtil } from "../editor/bookmarkShape"
+import { IPageBookmarkShape, PageBookmarkUtil } from "../canvas/bookmarkShape"
 import { nanoid } from "nanoid"
 import Link from "next/link"
 import { FullLink } from "../utils/tinycomponents"
+import { BookmarkFilledIcon } from "@radix-ui/react-icons"
 
 
 export function zoomToShape(editor: Editor, shapeId: TLShapeId) {
@@ -60,7 +61,7 @@ export default function Bookmarks({ editor, workspaceId }: { editor: Editor | un
                             kind: 'bookmark',
                             name: bookmarkText
                         } as LinkInsert))
-                    }}>{bookmarkText}</FullLink>
+                    }}><BookmarkFilledIcon className='inline-block' style={{ color: bookmark.props.color }}></BookmarkFilledIcon> {bookmarkText}</FullLink>
                 )
                 //setBookmarks(prev => [...prev, <Text key={id}>{i}</Text>])
             }

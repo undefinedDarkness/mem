@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import dynamic from 'next/dynamic'
 import Settings from "../dashboard/Settings";
 import EmbeddedWebsites from "../dashboard/embeddedwebsites";
-import TextEditor from "../dashboard/textEditor";
+import TextEditor from "../texteditor/textEditor";
 
 const PDFWindow = dynamic(() => import('../dashboard/pdf'), { ssr: false })
 

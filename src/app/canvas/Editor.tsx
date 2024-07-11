@@ -28,7 +28,7 @@ const overrides: TLUiOverrides = {
   },
 
   actions(editor, actions) {
-    console.log(actions)
+    // console.log(actions)
     return {
       ...actions,
       'exit-pen-mode': { ...actions['exit-pen-mode'], kbd: "Escape" }

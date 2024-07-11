@@ -1,5 +1,5 @@
 'use client'
-import CanvasEditor from "./editor/Editor";
+import CanvasEditor from "./canvas/Editor";
 import { LayoutContainer } from "./dashboard/layoutcontainer";
 import { Sidebar } from "./sidebar/sidebar";
 import Cookies from "js-cookie";

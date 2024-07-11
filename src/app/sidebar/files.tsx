@@ -4,7 +4,7 @@ import { get } from 'idb-keyval'
 import { Workspace, getWorkspaceDirectory } from "../utils/db"
 import { useState, useEffect, ReactNode, ReactElement, ElementType, useCallback } from 'react'
 import { DocumentIcon, DocumentTextIcon, FolderOpenIcon, FolderIcon, PresentationChartBarIcon, XMarkIcon, CloudArrowDownIcon } from '@heroicons/react/16/solid'
-import { AlertDialog, Box, Button, Flex, Separator, Text } from '@radix-ui/themes'
+import { AlertDialog, Box, Button, Flex, IconButton, Separator, Text } from '@radix-ui/themes'
 import Link from 'next/link'
 import { useDropzone } from 'react-dropzone'
 import { CheckmarkIcon, toast, ErrorIcon } from 'react-hot-toast'
@@ -135,7 +135,7 @@ export default function Files({ workspaceId }: { workspaceId: string }) {
                 <AlertDialog.Description>Permissions to the directory need to be granted again manually</AlertDialog.Description>
                 <Flex gap="3">
                     <AlertDialog.Cancel>
-                        <Button color='red'><XMarkIcon className='size-5'></XMarkIcon> Cancel</Button>
+                        <IconButton color='red'><XMarkIcon className='size-5'></XMarkIcon> Cancel</IconButton>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action>
                         <Button onClick={() => {

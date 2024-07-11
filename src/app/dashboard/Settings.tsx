@@ -1,4 +1,4 @@
-import { Flex, Heading, TextField, Text, Button } from "@radix-ui/themes";
+import { Flex, Heading, TextField, Text, Button, IconButton } from "@radix-ui/themes";
 import { GlobeAsiaAustraliaIcon, PlusIcon } from "@heroicons/react/16/solid";
 import { get, update } from "idb-keyval";
 import { FormEvent, ReactNode, useEffect, useState } from "react";
@@ -47,7 +47,7 @@ export default function Settings() {
                             <GlobeAsiaAustraliaIcon className="size-5"></GlobeAsiaAustraliaIcon>
                         </TextField.Slot>
                     </TextField.Root>
-                    <Button><PlusIcon className="size-5"></PlusIcon></Button>
+                    <IconButton><PlusIcon className="size-5"></PlusIcon></IconButton>
                 </Flex></form>
         </section>
     </Flex></article>

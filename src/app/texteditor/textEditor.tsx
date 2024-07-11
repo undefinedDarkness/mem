@@ -1,20 +1,31 @@
 import React from 'react';
 import * as Toolbar from '@radix-ui/react-toolbar';
-import { useEditor, EditorContent, useCurrentEditor, EditorProvider } from '@tiptap/react';
+import { useCurrentEditor, EditorProvider } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { Underline} from '@tiptap/extension-underline'
 import {
   FontBoldIcon,
   FontItalicIcon,
-  UnderlineIcon,
   ListBulletIcon,
   TextAlignLeftIcon,
-  LinkBreak2Icon,
   CodeIcon,
   MinusIcon,
   ResetIcon,
+  UnderlineIcon,
   ReloadIcon,
 } from '@radix-ui/react-icons';
 import { Heading1, Heading2, Heading3 } from '../utils/tinycomponents';
+import { Select } from '@radix-ui/themes';
+import FontPicker from './fontPicker';
+import { TextStyle } from '@tiptap/extension-text-style'
+import { FontFamily } from '@tiptap/extension-font-family'
+
+const extensions = [
+  StarterKit,
+  Underline,
+  TextStyle,
+  FontFamily
+]
 
 const TiptapToolbar = () => {
   const { editor } = useCurrentEditor()
@@ -77,15 +88,44 @@ const TiptapToolbar = () => {
         >
           <FontItalicIcon className="w-5 h-5" />
         </Toolbar.ToggleItem>
-        {/* <Toolbar.ToggleItem
+        <Toolbar.ToggleItem
           className={getItemClass(editor.isActive('underline'), false)}
           value="underline"
           aria-label="Underline"
           onClick={() => editor.chain().focus().toggleUnderline().run()}
         >
           <UnderlineIcon className="w-5 h-5" />
-        </Toolbar.ToggleItem> */}
+        </Toolbar.ToggleItem>
       </Toolbar.ToggleGroup>
+      <Toolbar.Separator className="w-px bg-gray-200 dark:bg-gray-700" />
+      <Toolbar.ToggleGroup type="single" aria-label='Heading Styles'>
+      <Toolbar.ToggleItem
+          className={getItemClass(editor.isActive('heading', { level: 1 }), false)}
+          value="h1"
+          aria-label="Heading 1"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+        >
+          <Heading1 className="w-5 h-5" />
+        </Toolbar.ToggleItem>
+        <Toolbar.ToggleItem
+          className={getItemClass(editor.isActive('heading', { level: 2 }), false)}
+          value="h2"
+          aria-label="Heading 2"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        >
+          <Heading2 className="w-5 h-5" />
+        </Toolbar.ToggleItem>
+        <Toolbar.ToggleItem
+          className={getItemClass(editor.isActive('heading', { level: 3 }), false)}
+          value="h3"
+          aria-label="Heading 3"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        >
+          <Heading3 className="w-5 h-5" />
+        </Toolbar.ToggleItem>
+      </Toolbar.ToggleGroup>
+      <Toolbar.Separator className="w-px bg-gray-200 dark:bg-gray-700" />
+      <FontPicker editor={editor}></FontPicker>
       <Toolbar.Separator className="w-px bg-gray-200 dark:bg-gray-700" />
       <Toolbar.ToggleGroup type="single" aria-label="List formatting">
         <Toolbar.ToggleItem
@@ -117,33 +157,6 @@ const TiptapToolbar = () => {
       </Toolbar.ToggleItem>
       </Toolbar.ToggleGroup>
       <Toolbar.Separator className="w-px bg-gray-200 dark:bg-gray-700" />
-      <Toolbar.ToggleGroup type="single" aria-label="Heading level">
-        <Toolbar.ToggleItem
-          className={getItemClass(editor.isActive('heading', { level: 1 }), false)}
-          value="h1"
-          aria-label="Heading 1"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        >
-          <Heading1 className="w-5 h-5" />
-        </Toolbar.ToggleItem>
-        <Toolbar.ToggleItem
-          className={getItemClass(editor.isActive('heading', { level: 2 }), false)}
-          value="h2"
-          aria-label="Heading 2"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        >
-          <Heading2 className="w-5 h-5" />
-        </Toolbar.ToggleItem>
-        <Toolbar.ToggleItem
-          className={getItemClass(editor.isActive('heading', { level: 3 }), false)}
-          value="h3"
-          aria-label="Heading 3"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        >
-          <Heading3 className="w-5 h-5" />
-        </Toolbar.ToggleItem>
-      </Toolbar.ToggleGroup>
-      <Toolbar.Separator className="w-px bg-gray-200 dark:bg-gray-700" />
       <Toolbar.Button
         className={getItemClass(false, false)}
         aria-label="Horizontal rule"
@@ -158,6 +171,6 @@ const TiptapToolbar = () => {
 export default function TextEditor() {
     return <div>
         <EditorProvider editorProps={{ attributes: { class: `prose prose-md dark:prose-invert m-5 focus:outline-none` } }} 
-                        extensions={[StarterKit]} slotBefore={<TiptapToolbar />} content={``}></EditorProvider>
+                        extensions={extensions} slotBefore={<TiptapToolbar />} content={``}></EditorProvider>
     </div>
 }
