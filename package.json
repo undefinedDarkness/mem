@@ -27,6 +27,7 @@
     "@types/wicg-file-system-access": "^2023.10.5",
     "allotment": "^1.20.2",
     "cheerio": "^1.0.0-rc.12",
+    "cmdk": "^1.0.0",
     "heroicons-lookup": "^2.0.0",
     "idb-keyval": "^6.2.1",
     "js-cookie": "^3.0.5",
@@ -40,8 +41,7 @@
     "react-hot-toast": "^2.4.1",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "tldraw": "^2.4.0-canary.3d07262e20c5",
-    "use-resize-observer": "^9.1.0"
+    "tldraw": "^2.4.0-canary.3d07262e20c5"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",

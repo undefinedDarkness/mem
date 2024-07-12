@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 import { DirectoryPicker } from "./directorypicker";
 import Cookies from 'js-cookie'
 import { nanoid } from "nanoid";
-import { Workspace } from "../utils/db";
+import { Workspace } from "../../utils/db";
 
 
 export default function Setup() {

@@ -1,7 +1,7 @@
 'use client'
 import { RichTreeView, TreeItem2, TreeItem2Label, TreeViewBaseItem } from '@mui/x-tree-view'
 import { get } from 'idb-keyval'
-import { Workspace, getWorkspaceDirectory } from "../../utils/db"
+import { Workspace, getWorkspaceDirectory } from "../../../utils/db"
 import { useState, useEffect, ReactNode, ReactElement, ElementType, useCallback } from 'react'
 import { DocumentIcon, DocumentTextIcon, FolderOpenIcon, FolderIcon, PresentationChartBarIcon, XMarkIcon, CloudArrowDownIcon } from '@heroicons/react/16/solid'
 import { AlertDialog, Box, Button, Flex, IconButton, Separator, Text } from '@radix-ui/themes'

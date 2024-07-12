@@ -39,7 +39,7 @@ export async function getFileHandleFromPath(path: string, dir: FileSystemDirecto
     })
   }
 
-export async function saveToFilesystem(editor: Editor) {
+export async function saveCanvasToFilesystem(editor: Editor) {
     const dir = await getWorkspaceDirectory();
     const fileHandle = await dir?.handle?.getFileHandle('Drawing.tldraw', { create: true });
 
@@ -50,7 +50,7 @@ export async function saveToFilesystem(editor: Editor) {
       toast.promise(
         toReadableStream(snapshot)
           .pipeThrough(new TextEncoderStream())
-          .pipeThrough(new CompressionStream('gzip'))
+          .pipeThrough(new CompressionStream('deflate'))
           .pipeTo(writable),
         {
           loading: 'Saving...',

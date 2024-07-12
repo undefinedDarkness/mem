@@ -6,7 +6,7 @@ import { get } from "idb-keyval"
 import { IPageBookmarkShape, PageBookmarkUtil } from "../canvas/bookmarkShape"
 import { nanoid } from "nanoid"
 import Link from "next/link"
-import { FullLink } from "../../utils/tinycomponents"
+import { FullLink } from "../../../utils/tinycomponents"
 import { BookmarkFilledIcon, BookmarkIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons"
 import { Command } from 'cmdk'
 

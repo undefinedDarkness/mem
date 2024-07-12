@@ -1,5 +1,5 @@
 import { useCurrentEditor } from '@tiptap/react'
-import Toolbar from '@radix-ui/react-toolbar';
+import * as Toolbar from '@radix-ui/react-toolbar';
 import {
     FontBoldIcon,
     FontItalicIcon,
@@ -11,7 +11,7 @@ import {
     UnderlineIcon,
     ReloadIcon,
   } from '@radix-ui/react-icons';
-  import { Heading1, Heading2, Heading3 } from '../utils/tinycomponents';
+  import { Heading1, Heading2, Heading3 } from '../../../utils/tinycomponents';
   import { Select } from '@radix-ui/themes';
   import FontPicker from './fontPicker';
 

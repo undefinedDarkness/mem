@@ -2,8 +2,8 @@
 
 import { useSearchParams } from "next/navigation"
 import { useEffect, useRef, useState } from "react";
-import { getWorkspaceDirectory } from "../utils/db";
-import { getFileHandleFromPath, toReadableStream } from "../utils/fs";
+import { getWorkspaceDirectory } from "../../utils/db";
+import { getFileHandleFromPath, toReadableStream } from "../../utils/fs";
 import toast from "react-hot-toast";
 // import { PDFViewerApplication } from "../../../public/pdfjs/web/viewer.mjs";
 

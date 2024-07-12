@@ -1,10 +1,8 @@
-'use client'
 
-import { cookies } from 'next/headers'
-import { ReactElement, ReactNode } from 'react'
 import { Allotment } from 'allotment'
 // import { Rnd } from 'react-rnd'
 import "allotment/dist/style.css";
+import { ReactNode } from 'react';
 
 export function LayoutContainer({ layout, sideBar, mainCanvas, ...props }: { layout: "sidepanel" | "floatingwindow", sideBar: ReactNode, mainCanvas: ReactNode }) {
 
