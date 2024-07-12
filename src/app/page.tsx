@@ -6,12 +6,10 @@ import Cookies from "js-cookie";
 import { debounce, Editor } from "tldraw";
 import { useEffect, useState } from "react";
 import { get, update } from "idb-keyval";
-import { Workspace } from "./utils/db";
+import { Workspace } from "../utils/db";
 import { useRouter } from "next/navigation";
 import { Toaster } from "react-hot-toast";
 
-import 'katex/dist/katex.min.css'
-import renderMathInElement from 'katex/contrib/auto-render';
 
 export default function Home() {
 
@@ -36,25 +34,7 @@ export default function Home() {
     })()
   })
 
-  useEffect(() => {
-    const updateMath = () => {
-      // TODO: Try optimizing this further!
-      console.log(`[math] Updated expressions`)
-      document.querySelectorAll('div.tl-text-content').forEach(el => renderMathInElement(el as HTMLElement, {
-        displayMode: false,
-        delimiters: [
-          {left: "\\(", right: "\\)", display: false},
-        ]
-      }))
-    }
 
-    const id = setInterval(updateMath, 9_000) 
-    // console.log(`wtf`)
-
-    return () => {
-      clearInterval(id)
-    }
-  }, [  ])
 
   return (
     <main>
