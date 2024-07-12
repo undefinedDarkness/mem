@@ -9,9 +9,12 @@ import { useSearchParams } from "next/navigation";
 import { zoomToShape } from "../sidebar/bookmarks";
 import { InternalLinkUtil } from "./internalLink";
 import { useRouter } from "next/navigation";
-import { clearUrlParam } from "../../utils/utils";
-import { saveToFilesystem } from "../../utils/fs";
+import { clearUrlParam } from "../../../utils/utils";
+import { saveCanvasToFilesystem } from "../../../utils/fs";
 
+
+import renderMathInElement from 'katex/contrib/auto-render';
+import 'katex/dist/katex.min.css'
 
 const overrides: TLUiOverrides = {
   tools(editor, schema) {
@@ -32,7 +35,7 @@ const overrides: TLUiOverrides = {
     return {
       ...actions,
       'exit-pen-mode': { ...actions['exit-pen-mode'], kbd: "Escape" }
-    } 
+    }
   }
 }
 
@@ -47,6 +50,29 @@ const components: TLUiComponents & TLEditorComponents = {
       </DefaultToolbar>
     )
   },
+}
+
+function RenderLatex() {
+    useEffect(() => {
+    const updateMath = () => {
+      // TODO: Try optimizing this further!
+      console.log(`[math] Updated expressions`)
+      document.querySelectorAll('div.tl-text-content').forEach(el => renderMathInElement(el as HTMLElement, {
+        displayMode: false,
+        delimiters: [
+          {left: "\\(", right: "\\)", display: false},
+        ]
+      }))
+    }
+
+    const id = setInterval(updateMath, 9_000) 
+
+    return () => {
+      clearInterval(id)
+    }
+  }, [  ])
+
+  return <></>
 }
 
 function QueryState() {
@@ -70,27 +96,25 @@ function QueryState() {
   return <></>
 }
 
-function SaveStateLocally() {
+// TODO: See if a save is required at all, https://tldraw.dev/docs/persistence#Listening-for-changes
+function SaveStateToFilesystem() {
   const editor = useEditor()
 
   useEffect(() => {
-    const onVisibilityChanged = async () => {
+    const onVisibilityChanged = debounce(() => {
       if (document.visibilityState != "hidden") return
-      await saveToFilesystem(editor);
-    }
+      saveCanvasToFilesystem(editor)
+    }, 5000)
 
     document.addEventListener('visibilitychange', onVisibilityChanged);
-    // const id = setInterval(_ => saveToFilesystem(editor), 10_000);
-
+    // const id = setInterval(onVisibilityChanged, 9_000)
     return () => {
       document.removeEventListener('visibilitychange', onVisibilityChanged)
       // clearInterval(id)
     }
-  }, [editor])
+  }, [])
 
   return <></>
-
- 
 }
 
 export default function CanvasEditor({ workspaceId, setEditor, ...props }: { workspaceId: string, setEditor: React.Dispatch<React.SetStateAction<Editor | undefined>> }) {
@@ -107,7 +131,8 @@ export default function CanvasEditor({ workspaceId, setEditor, ...props }: { wor
     <>
       <Tldraw tools={[PageBookmarkTool]} components={components} overrides={overrides} shapeUtils={[PageBookmarkUtil, InternalLinkUtil]} {...props} onMount={onMount} inferDarkMode={true} persistenceKey={workspaceId}>
         <QueryState />
-        <SaveStateLocally />
+        <SaveStateToFilesystem />
+        <RenderLatex />
       </Tldraw>
     </>
   );
