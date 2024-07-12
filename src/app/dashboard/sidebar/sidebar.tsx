@@ -5,11 +5,11 @@ import { Editor } from "tldraw";
 import Bookmarks from "./bookmarks";
 import { useSearchParams } from "next/navigation";
 import dynamic from 'next/dynamic'
-import Settings from "../dashboard/Settings";
-import EmbeddedWebsites from "../dashboard/embeddedwebsites";
+import Settings from "../Settings";
+import EmbeddedWebsites from "../embeddedwebsites";
 import TextEditor from "../texteditor/textEditor";
 
-const PDFWindow = dynamic(() => import('../dashboard/pdf'), { ssr: false })
+const PDFWindow = dynamic(() => import('../pdf'), { ssr: false })
 
 export function Sidebar({ workspaceId, editor }: { workspaceId: string, editor: Editor | undefined }) {
     const params = useSearchParams()

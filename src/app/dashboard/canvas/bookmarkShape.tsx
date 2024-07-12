@@ -12,10 +12,10 @@ import {
     resizeBox,
 } from 'tldraw'
 import { nanoid } from 'nanoid'
-import { update } from 'idb-keyval'
+import { get, set, update } from 'idb-keyval'
 import { BookmarkIcon } from '@heroicons/react/16/solid'
 import { Badge, Button, Flex, IconButton, Popover, Separator, Text, TextField, } from '@radix-ui/themes'
-import { KeyboardEventHandler, useRef, useState } from 'react'
+import { KeyboardEventHandler, useEffect, useRef, useState } from 'react'
 import { HexColorPicker } from 'react-colorful'
 import { ArrowRightIcon, Cross1Icon, Cross2Icon, PlusIcon } from '@radix-ui/react-icons'
 
@@ -81,6 +81,13 @@ export class PageBookmarkUtil extends ShapeUtil<IPageBookmarkShape> {
             }
         }
 
+        const [bookmarkOptions, setBookmarkOptions ] = useState<string[]>([])
+        useEffect(() => {
+            get<Set<string>>('bookmark-tags').then(v => setBookmarkOptions(Array.from(v ?? new Set())))
+
+            return () => setBookmarkOptions([])
+        }, [])
+
         const updateColor = (color: string) => {
             this.editor.updateShape({
                 id: shape.id,
@@ -100,9 +107,8 @@ export class PageBookmarkUtil extends ShapeUtil<IPageBookmarkShape> {
                     tags
                 }
             })
+            set('bookmark-tags', new Set(tags))
         }
-
-        const [tagInputOpen, setTagInputOpen] = useState(false)
 
         return <HTMLContainer className='rounded-md bg-zinc-800 p-2 font-sans space-y-3' style={{ pointerEvents: 'all' }}>
             <Flex direction={'column'} gap='2'>
@@ -115,7 +121,7 @@ export class PageBookmarkUtil extends ShapeUtil<IPageBookmarkShape> {
                 <Separator size='4' />
                 <Flex justify={'between'}>
                     <Flex gap="2" wrap="wrap">{
-                        shape.props.tags.map(t => <Badge key={t} size='1' className='text-sm space-x-3'>
+                        [...new Set(shape.props.tags)].map(t => <Badge key={t} size='1' className='text-sm space-x-3'>
                             {t}
                             <IconButton onPointerDown={e => e.stopPropagation()} onClick={_ => updateTags(shape.props.tags.filter(_t => _t != t))} className='cursor-pointer' variant='ghost'>
                                 <Cross2Icon ></Cross2Icon>
@@ -125,7 +131,9 @@ export class PageBookmarkUtil extends ShapeUtil<IPageBookmarkShape> {
 
                     <AddTagMenu updateTags={updateTags} currentTags={shape.props.tags}></AddTagMenu>
                     <datalist id='allCurrentTags'>
-                        <option value="Education"></option>
+                        {
+                            bookmarkOptions.map(t => <option key={t} value={t}></option>)
+                        }
                     </datalist>
                 </Flex>
             </Flex>
@@ -176,6 +184,7 @@ function BookmareColourIcon({ color, updateColor, isEditing }: { isEditing: bool
     </Popover.Root></div>
 }
 
+// TODO: Consider using react-select or replacing with a combobox when that comes out
 function AddTagMenu({ updateTags, currentTags }: { currentTags: string[], updateTags: (tags: string[]) => void }) {
     const [tagInputOpen, setTagInputOpen] = useState(false)
     const tagInput = useRef(null)

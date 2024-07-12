@@ -9,8 +9,8 @@ import { useSearchParams } from "next/navigation";
 import { zoomToShape } from "../sidebar/bookmarks";
 import { InternalLinkUtil } from "./internalLink";
 import { useRouter } from "next/navigation";
-import { clearUrlParam } from "../utils/utils";
-import { saveToFilesystem } from "../utils/fs";
+import { clearUrlParam } from "../../utils/utils";
+import { saveToFilesystem } from "../../utils/fs";
 
 
 const overrides: TLUiOverrides = {

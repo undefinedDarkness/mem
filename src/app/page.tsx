@@ -1,7 +1,7 @@
 'use client'
-import CanvasEditor from "./canvas/Editor";
+import CanvasEditor from "./dashboard/canvas/Editor";
 import { LayoutContainer } from "./dashboard/layoutcontainer";
-import { Sidebar } from "./sidebar/sidebar";
+import { Sidebar } from "./dashboard/sidebar/sidebar";
 import Cookies from "js-cookie";
 import { debounce, Editor } from "tldraw";
 import { useEffect, useState } from "react";
@@ -48,7 +48,7 @@ export default function Home() {
       }))
     }
 
-    const id = setInterval(updateMath, 10_000) 
+    const id = setInterval(updateMath, 9_000) 
     // console.log(`wtf`)
 
     return () => {
