@@ -20,8 +20,8 @@ export function Sidebar({ workspaceId, editor }: { workspaceId: string, editor: 
                 <Tabs.Trigger value="bookmarks"><BookmarkIcon className="size-5"></BookmarkIcon></Tabs.Trigger>
                 <Tabs.Trigger value="document"><DocumentIcon className="size-5" /></Tabs.Trigger>
                 <Tabs.Trigger value="text"><PencilIcon className="size-5"></PencilIcon></Tabs.Trigger>
-                <Tabs.Trigger value="websites"><GlobeAmericasIcon className="size-5"></GlobeAmericasIcon></Tabs.Trigger>
-                <Tabs.Trigger value="actions"><Cog8ToothIcon className="size-5"></Cog8ToothIcon></Tabs.Trigger>
+                {/* <Tabs.Trigger value="websites"><GlobeAmericasIcon className="size-5"></GlobeAmericasIcon></Tabs.Trigger>
+                <Tabs.Trigger value="actions"><Cog8ToothIcon className="size-5"></Cog8ToothIcon></Tabs.Trigger> */}
             </Tabs.List>
 
             <Box className="h-full">
@@ -34,12 +34,12 @@ export function Sidebar({ workspaceId, editor }: { workspaceId: string, editor: 
                 <Tabs.Content value="document" className="h-full max-h-[95vh] data-[state=inactive]:hidden" forceMount>
                     <PDFWindow></PDFWindow>
                 </Tabs.Content>
-                <Tabs.Content value="actions">
+                {/* <Tabs.Content value="actions">
                     <Settings></Settings>
                 </Tabs.Content>
                 <Tabs.Content value='websites' className="h-full data-[state=inactive]:hidden" forceMount>
                     <EmbeddedWebsites></EmbeddedWebsites>
-                </Tabs.Content>
+                </Tabs.Content> */}
                 <Tabs.Content value='text' className="h-full"> 
                     <TextEditor />
                 </Tabs.Content>
