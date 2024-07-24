@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     }))
                     const documentWorkspacePath = window.documentWorkspacePath
                     const newUrl = new URL(window.top.location.href);
+                    newUrl.searchParams.set('documentWorkspacePath', documentWorkspacePath)
                     newUrl.searchParams.set('documentPageNo', pageNo);
                     _evt.dataTransfer.setData('custom/link-insert', JSON.stringify({
                         name: app.documentInfo['Title']?.trim() ?? documentWorkspacePath.split('/').pop(),
