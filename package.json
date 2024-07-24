@@ -23,12 +23,13 @@
     "@tiptap/starter-kit": "^2.4.0",
     "@types/js-cookie": "^3.0.6",
     "@types/katex": "^0.16.7",
-    "@types/pdfjs-dist": "^2.10.378",
     "@types/wicg-file-system-access": "^2023.10.5",
     "allotment": "^1.20.2",
     "cheerio": "^1.0.0-rc.12",
+    "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "heroicons-lookup": "^2.0.0",
+    "human-id": "^4.1.1",
     "idb-keyval": "^6.2.1",
     "js-cookie": "^3.0.5",
     "katex": "^0.16.11",
@@ -41,7 +42,7 @@
     "react-hot-toast": "^2.4.1",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "tldraw": "^2.4.0-canary.3d07262e20c5"
+    "tldraw": "^2.3.0"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",

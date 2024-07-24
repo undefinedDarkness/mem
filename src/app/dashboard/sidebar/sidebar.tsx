@@ -24,23 +24,23 @@ export function Sidebar({ workspaceId, editor }: { workspaceId: string, editor: 
                 <Tabs.Trigger value="actions"><Cog8ToothIcon className="size-5"></Cog8ToothIcon></Tabs.Trigger>
             </Tabs.List>
 
-            <Box pt="3" className="h-full">
-                <Tabs.Content value="files" className="p-4">
+            <Box className="h-full">
+                <Tabs.Content value="files" className="p-4 data-[state=inactive]:hidden">
                     <Files workspaceId={workspaceId}></Files>
                 </Tabs.Content>
                 <Tabs.Content value="bookmarks">
                     <Bookmarks workspaceId={workspaceId} editor={editor}></Bookmarks>
                 </Tabs.Content>
-                <Tabs.Content value="document" className="h-full">
+                <Tabs.Content value="document" className="h-full max-h-[95vh] data-[state=inactive]:hidden" forceMount>
                     <PDFWindow></PDFWindow>
                 </Tabs.Content>
                 <Tabs.Content value="actions">
                     <Settings></Settings>
                 </Tabs.Content>
-                <Tabs.Content value='websites' className="h-full">
+                <Tabs.Content value='websites' className="h-full data-[state=inactive]:hidden" forceMount>
                     <EmbeddedWebsites></EmbeddedWebsites>
                 </Tabs.Content>
-                <Tabs.Content value='text' className="h-full p-4">
+                <Tabs.Content value='text' className="h-full"> 
                     <TextEditor />
                 </Tabs.Content>
             </Box>

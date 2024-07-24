@@ -1,6 +1,7 @@
 import { Select } from "@radix-ui/themes";
 import { Editor } from "@tiptap/react";
 import { useEffect, useState } from "react";
+import { get, set } from 'idb-keyval'
 
 export default function FontPicker({ editor }: { editor: Editor}) {
     const [systemFonts, setFonts] = useState<string[]>([]);
@@ -9,12 +10,18 @@ export default function FontPicker({ editor }: { editor: Editor}) {
         if (!v || !('queryLocalFonts' in window) || systemFonts.length > 0) return;
         try {
             (window as any).queryLocalFonts().then((fonts: any) => {
-                setFonts([...new Set<string>(fonts.map((fnt: any) => fnt.family as string))])
+                const fontsList = [...new Set<string>(fonts.map((fnt: any) => fnt.family as string))]
+                setFonts(fontsList)
+                set('system-fonts', fontsList) 
             })
         } catch (err) {
             console.error(`[font-picker] ${err}`)
         }
     }
+
+    useEffect(() => {
+        get('system-fonts').then(v => v && setFonts(v))
+    }, [])
 
 
     return <Select.Root defaultValue="system-ui" onOpenChange={queryFonts} onValueChange={e => editor.chain().focus().setFontFamily(e).run()}>

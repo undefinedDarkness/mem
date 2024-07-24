@@ -2,10 +2,10 @@ import { Editor } from 'tldraw';
 import { getWorkspaceDirectory } from './db'
 import toast from 'react-hot-toast';
 
-export async function getFileHandleFromPath(path: string, dir: FileSystemDirectoryHandle) {
+export async function getFileHandleFromPath(path: string, dir?: FileSystemDirectoryHandle, create = false) {
     try {
       // Get the root directory handle
-      const root = dir;
+      const root = dir ?? (await getWorkspaceDirectory())?.handle!;
 
       // Split the path, but keep the last segment (file name) as is
       const segments = path.split('/');
@@ -17,11 +17,11 @@ export async function getFileHandleFromPath(path: string, dir: FileSystemDirecto
       
       // Traverse the directory structure
       for (const segment of directories) {
-        currentHandle = await currentHandle.getDirectoryHandle(segment, { create: false });
+        currentHandle = await currentHandle.getDirectoryHandle(segment, { create  });
       }
       
       // Get the file handle for the file name (which may contain spaces)
-      const fileHandle = await currentHandle.getFileHandle(fileName, { create: false });
+      const fileHandle = await currentHandle.getFileHandle(fileName, { create  });
       
       return fileHandle;
     } catch (error) {
@@ -50,14 +50,14 @@ export async function saveCanvasToFilesystem(editor: Editor) {
       toast.promise(
         toReadableStream(snapshot)
           .pipeThrough(new TextEncoderStream())
-          .pipeThrough(new CompressionStream('deflate'))
+          .pipeThrough(new CompressionStream('gzip'))
           .pipeTo(writable),
         {
-          loading: 'Saving...',
-          success: `Saved`,
+          loading: '[c] Saving...',
+          success: `[c] Saved`,
           error: (err: Error) => {
             console.error(err);
-            return `Encountered error while saving, ${err.toString()}`;
+            return `[c] Encountered error while saving, ${err.toString()}`;
           }
         });
     } else {

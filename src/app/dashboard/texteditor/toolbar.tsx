@@ -40,7 +40,7 @@ export const TiptapToolbar = () => {
     };
   
     return (
-      <Toolbar.Root className="flex flex-wrap p-1 space-x-1 light:bg-white max-w-fit border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
+      <Toolbar.Root className="m-2 flex flex-wrap p-1 space-x-1 light:bg-white max-w-fit border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
         <div>
           <Toolbar.Button
             className={getItemClass(false, !editor.can().chain().focus().undo().run())}
@@ -85,7 +85,7 @@ export const TiptapToolbar = () => {
             <UnderlineIcon className="w-5 h-5" />
           </Toolbar.ToggleItem>
         </Toolbar.ToggleGroup>
-        <Toolbar.ToggleGroup type="single" aria-label='Heading Styles'>
+        {/* <Toolbar.ToggleGroup type="single" aria-label='Heading Styles'>
           <Toolbar.ToggleItem
             className={getItemClass(editor.isActive('heading', { level: 1 }), false)}
             value="h1"
@@ -110,9 +110,9 @@ export const TiptapToolbar = () => {
           >
             <Heading3 className="w-5 h-5" />
           </Toolbar.ToggleItem>
-        </Toolbar.ToggleGroup>
+        </Toolbar.ToggleGroup> */}
         <FontPicker editor={editor}></FontPicker>
-        <Toolbar.ToggleGroup type="single" aria-label="List formatting">
+        {/* <Toolbar.ToggleGroup type="single" aria-label="List formatting">
           <Toolbar.ToggleItem
             className={getItemClass(editor.isActive('bulletList'), false)}
             value="bullet-list"
@@ -146,7 +146,7 @@ export const TiptapToolbar = () => {
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
         >
           <MinusIcon className="w-5 h-5" />
-        </Toolbar.Button>
+        </Toolbar.Button> */}
       </Toolbar.Root>
     );
   };

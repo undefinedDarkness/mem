@@ -57,7 +57,12 @@ function CustomTreeItem({ itemId, label, ...props }: { itemId: string, label: st
         // }
     }
 
-    return <TreeItem2 className='[&_.MuiTreeItem-label]:!font-sans' slots={{ icon: iconMap[extension], label: treeLabel }} itemId={itemId} {...props}>
+    return <TreeItem2 className='[&_.MuiTreeItem-label]:!font-sans' slots={{
+        icon: () => {
+            let El = iconMap[extension]
+            return El ? <El></El> : <></>
+        }, label: treeLabel
+    }} itemId={itemId} {...props}>
     </TreeItem2>
 }
 

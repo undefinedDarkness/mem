@@ -9,6 +9,7 @@ import { get, update } from "idb-keyval";
 import { Workspace } from "../utils/db";
 import { useRouter } from "next/navigation";
 import { Toaster } from "react-hot-toast";
+import { initBroadcastChannel } from "@/utils/bc";
 
 
 export default function Home() {
@@ -32,7 +33,11 @@ export default function Home() {
         }
       }
     })()
-  })
+
+    initBroadcastChannel()
+
+    return () => {}
+  }, [])
 
 
 

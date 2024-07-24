@@ -47,6 +47,11 @@ export async function getWorkspace(id?: string) {
     return (await get<Workspace>(id))
 }
 
+export interface FileHandleWithPath {
+    handle?: FileSystemFileHandle,
+    path: string
+}
+
 export async function getWorkspaceDirectory(id?: string) {
     const workspace = await getWorkspace(id)
     if (workspace) {

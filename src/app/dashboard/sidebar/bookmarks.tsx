@@ -1,15 +1,13 @@
 'use client'
-import { Box, Flex, Text, TextField } from "@radix-ui/themes"
-import { Editor, TLParentId, TLShape, TLShapeId, createShapeId } from "tldraw"
-import { ReactNode, useCallback, useEffect, useState } from "react"
+import { IconButton, Text, TextField } from "@radix-ui/themes"
+import { Editor, TLShapeId, createShapeId } from "tldraw"
+import { ReactNode, useEffect, useState } from "react"
 import { get } from "idb-keyval"
-import { IPageBookmarkShape, PageBookmarkUtil } from "../canvas/bookmarkShape"
-import { nanoid } from "nanoid"
-import Link from "next/link"
+import { IPageBookmarkShape } from "../canvas/bookmarkShape"
 import { FullLink } from "../../../utils/tinycomponents"
-import { BookmarkFilledIcon, BookmarkIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons"
+import { BookmarkFilledIcon, MagnifyingGlassIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { Command } from 'cmdk'
-
+import { onBroadcast } from "@/utils/bc"
 
 export function zoomToShape(editor: Editor, shapeId: TLShapeId) {
     const all = editor.getSelectedShapeIds()
@@ -33,47 +31,68 @@ export interface LinkInsert {
 
 async function getBookmarks(editor: Editor) {
     const bookmarkIds: string[] | undefined = await get('bookmarks')
-    return await Promise.all(bookmarkIds?.map(id => {
+    const newBookmarks: string[] = []
+    const v = await Promise.all(bookmarkIds?.map(id => {
         let shape = editor.getShape(createShapeId(id)) as IPageBookmarkShape | undefined
+        if (shape) newBookmarks.push(id)
         return { bookmark: shape, internalId: id }
     }) ?? [])
+    return v
 }
 
 export default function Bookmarks({ editor, workspaceId }: { editor: Editor | undefined, workspaceId: string }) {
 
-    const [bookmark, setBookmarks] = useState<ReactNode[]>([])
+    const [bookmarkEl, setBookmarksEl] = useState<ReactNode[]>([])
+    const [bookmarks, setBookmarks] = useState<Awaited<ReturnType<typeof getBookmarks>>>([])
 
     // TODO: Add groups of each tag!
     useEffect(() => {
         if (!editor) return
 
-        getBookmarks(editor).then(bookmarks => setBookmarks(bookmarks.map(({ bookmark, internalId }) => {
+        setBookmarksEl(bookmarks.map(({ bookmark, internalId }) => {
             if (!bookmark) return;
             const bookmarkText = bookmark.props.text
             const bookmarkPage = editor.getAncestorPageId(bookmark.id)!;
             const bookmarkUrl = new URL(window.location.href)
             bookmarkUrl.searchParams.set('zoomToShape', internalId)
             bookmarkUrl.searchParams.set('canvasPage', bookmarkPage)
-            return <Command.Item value={bookmarkText}>
+            return <Command.Item value={bookmarkText} key={internalId}>
                 <FullLink href={bookmarkUrl.href} className="space-x-4 text-nowrap"><BookmarkFilledIcon className="!inline-block" style={{ color: bookmark.props.color }}></BookmarkFilledIcon><Text>{bookmarkText}</Text></FullLink>
             </Command.Item>
-        })))
+        }))
 
         return () => {
-            setBookmarks([])
+            setBookmarksEl([])
+        }
+    }, [bookmarks])
+
+    useEffect(() => {
+        if (!editor) return
+        getBookmarks(editor).then(r => setBookmarks(r)).catch(err => {
+            console.error(`[bookmarks] ${err}`)
+        })
+
+        onBroadcast('bookmark-update', () => {
+            editor && getBookmarks(editor).then(r => setBookmarks(r))
+        })
+
+        return () => {
         }
     }, [])
 
     return <Command className="p-2 space-y-2">
         <Command.Input asChild>
-            <TextField.Root className="max-w-[35vw]">
-                <TextField.Slot><MagnifyingGlassIcon></MagnifyingGlassIcon></TextField.Slot>
-            </TextField.Root>
+            <div className="flex gap-2">
+                <TextField.Root className="max-w-[35vw] flex-1">
+                    <TextField.Slot><MagnifyingGlassIcon></MagnifyingGlassIcon></TextField.Slot>
+                </TextField.Root>
+                <IconButton onClick={_ => editor && getBookmarks(editor).then(setBookmarks)}><ReloadIcon></ReloadIcon></IconButton>
+            </div>
         </Command.Input>
         <Command.List >
-            <Command.Empty>No results found</Command.Empty>
+            <Command.Empty className="text-center italic">No results found</Command.Empty>
             {
-                bookmark
+                bookmarkEl
             }
         </Command.List>
     </Command>

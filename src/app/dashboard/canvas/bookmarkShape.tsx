@@ -18,6 +18,9 @@ import { Badge, Button, Flex, IconButton, Popover, Separator, Text, TextField, }
 import { KeyboardEventHandler, useEffect, useRef, useState } from 'react'
 import { HexColorPicker } from 'react-colorful'
 import { ArrowRightIcon, Cross1Icon, Cross2Icon, PlusIcon } from '@radix-ui/react-icons'
+import { humanId } from 'human-id'
+import { useBroadcastChannel } from 'use-broadcast-channel'
+import { broadcast } from '@/utils/bc'
 
 export type IPageBookmarkShape = TLBaseShape<
     'page-bookmark-shape',
@@ -42,7 +45,7 @@ export class PageBookmarkUtil extends ShapeUtil<IPageBookmarkShape> {
 
     getDefaultProps(): IPageBookmarkShape['props'] {
         return {
-            text: 'New Bookmark',
+            text: humanId(),
             w: 250,
             h: 100,
             color: 'blue',
@@ -81,7 +84,7 @@ export class PageBookmarkUtil extends ShapeUtil<IPageBookmarkShape> {
             }
         }
 
-        const [bookmarkOptions, setBookmarkOptions ] = useState<string[]>([])
+        const [bookmarkOptions, setBookmarkOptions] = useState<string[]>([])
         useEffect(() => {
             get<Set<string>>('bookmark-tags').then(v => setBookmarkOptions(Array.from(v ?? new Set())))
 
@@ -143,8 +146,6 @@ export class PageBookmarkUtil extends ShapeUtil<IPageBookmarkShape> {
     indicator(shape: IPageBookmarkShape) {
         return <rect width={shape.props.w} height={shape.props.h} />
     }
-
-
 }
 
 export class PageBookmarkTool extends StateNode {
@@ -162,13 +163,14 @@ export class PageBookmarkTool extends StateNode {
         await update('bookmarks', (r: string[] | undefined) => {
             r?.push(id)
             return r ?? [id]
-        })
+        });
+        broadcast('bookmark-update')
         this.editor.createShape({
             id: createShapeId(id),
             type: 'page-bookmark-shape',
             x: currentPagePoint.x,
             y: currentPagePoint.y,
-            props: { text: 'NEW BOOKMARK' },
+            props: {},
         })
     }
 }

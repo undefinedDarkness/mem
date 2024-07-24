@@ -1,3 +1,4 @@
+let initializedDefaultFile = false
 document.addEventListener("DOMContentLoaded", function () {
     console.log(`[pdf-iframe] Web Viewer Loaded`);
     PDFViewerApplication.downloadOrSave = onSave
@@ -8,8 +9,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const app = PDFViewerApplication
 
         console.log(`[pdf-iframe] New PDF initialized!`);
-        window.top.postMessage('pdf-ready-for-data', '*')
+        window.top.postMessage({ id: 'pdf-ready-for-data' }, '*')
+
         app.eventBus.on('pagesinit', () => {
+            if (initializedDefaultFile) {
+                window.top.postMessage({ id: `pdf-loaded-new` }, '*')
+            } else {
+                initializedDefaultFile = true;
+            }
             for (const pageEl of document.querySelectorAll('.page')) {
                 let canvasElem = undefined
                 //  = pageEl.querySelector('canvas')
@@ -42,27 +49,37 @@ document.addEventListener("DOMContentLoaded", function () {
 async function onSave() {
     if (PDFViewerApplication._saveInProgress) {
         return;
-      }
-      PDFViewerApplication._saveInProgress = true;
-      await PDFViewerApplication.pdfScriptingManager.dispatchWillSave();
-      const url = PDFViewerApplication._downloadUrl;
-      const filename = PDFViewerApplication._docFilename;
-      try {
+    }
+    PDFViewerApplication._saveInProgress = true;
+    await PDFViewerApplication.pdfScriptingManager.dispatchWillSave();
+    const url = PDFViewerApplication._downloadUrl;
+    const filename = PDFViewerApplication._docFilename;
+    try {
         PDFViewerApplication._ensureDownloadComplete();
         /** @type Uint8Array */
         const data = await PDFViewerApplication.pdfDocument.saveDocument();
-        console.log(data)
         // const blob = new Blob([data], {
         //   type: "application/pdf",
         // });
-        // console.log('[pdf-iframe]', blob, data, url, filename);
-        window.top.postMessage(data, '*', [data.buffer])
-       
-      } catch (reason) {
+        console.log('[pdf-iframe] Sending data to parent for save o/p');
+        window.top.postMessage({
+            id: 'pdf-save-pdf', data: {
+                blob: data,
+                documentName: PDFViewerApplication.documentInfo['Title']?.trim() ?? window.documentWorkspacePath.split('/').pop(),
+                documentWorkspacePath: window.documentWorkspacePath
+            }
+        }, '*', [data.buffer])
+
+    } catch (reason) {
         console.error(`Error when saving the document: ${reason.message}`);
         await PDFViewerApplication.download({});
-      } finally {
+    } finally {
         await PDFViewerApplication.pdfScriptingManager.dispatchDidSave();
         PDFViewerApplication._saveInProgress = false;
-      }
+    }
 }
+
+window.addEventListener('message', (ev) => {
+    if (ev.data == 'pdf-want-download')
+        PDFViewerApplication.download({})
+})
