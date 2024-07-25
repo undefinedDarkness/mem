@@ -1,6 +1,4 @@
-
 import { Allotment } from 'allotment'
-// import { Rnd } from 'react-rnd'
 import "allotment/dist/style.css";
 import { ReactNode } from 'react';
 
@@ -12,9 +10,6 @@ export function LayoutContainer({ layout, sideBar, mainCanvas, ...props }: { lay
             <Allotment.Pane className='w-full h-full'>{mainCanvas}</Allotment.Pane>
         </Allotment> :
         <div className='w-[100vw] h-[100vh] overflow-hidden'>
-            {/* <Rnd default={{ width: '30vw', height: '50vh', x: 50, y: 50 }} className="z-10 p-2 border rounded-md [&:not(:hover)]:border-transparent">
-                {sideBar}
-            </Rnd> */}
             <div className='fixed inset-0'>{mainCanvas}</div>
         </div>
 
