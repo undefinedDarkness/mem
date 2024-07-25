@@ -19,7 +19,6 @@ import { KeyboardEventHandler, useEffect, useRef, useState } from 'react'
 import { HexColorPicker } from 'react-colorful'
 import { ArrowRightIcon, Cross1Icon, Cross2Icon, PlusIcon } from '@radix-ui/react-icons'
 import { humanId } from 'human-id'
-import { useBroadcastChannel } from 'use-broadcast-channel'
 import { broadcast } from '@/utils/bc'
 
 export type IPageBookmarkShape = TLBaseShape<
@@ -71,16 +70,21 @@ export class PageBookmarkUtil extends ShapeUtil<IPageBookmarkShape> {
 
     component(shape: IPageBookmarkShape) {
         let isEditing = this.editor.getEditingShapeId() === shape.id
+
+        const updateText = (e: HTMLInputElement) => {
+            this.editor.updateShape({
+                id: shape.id,
+                type: 'page-bookmark-shape',
+                props: {
+                    text: (e as HTMLInputElement)?.value ?? shape.props.text
+                }
+            })
+            isEditing && this.editor.complete()
+        }
+
         const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (ev) => {
             if (ev.key === 'Enter') {
-                this.editor.updateShape({
-                    id: shape.id,
-                    type: 'page-bookmark-shape',
-                    props: {
-                        text: (ev.target as HTMLInputElement)?.value ?? shape.props.text
-                    }
-                })
-                this.editor.complete()
+                updateText(ev.target as HTMLInputElement)
             }
         }
 
@@ -118,7 +122,7 @@ export class PageBookmarkUtil extends ShapeUtil<IPageBookmarkShape> {
                 <Flex gap="2" align={'center'}>
                     <BookmareColourIcon isEditing={isEditing} updateColor={updateColor} color={shape.props.color} />
                     {isEditing ?
-                        <TextField.Root size='1' onPointerDown={e => e.stopPropagation()} placeholder={shape.props.text} onKeyDown={handleKeyDown}></TextField.Root> :
+                        <TextField.Root size='1' onPointerDown={e => e.stopPropagation()} onBlur={e => updateText(e.target)} placeholder={shape.props.text} onKeyDown={handleKeyDown}></TextField.Root> :
                         <Text className='text-lg'>{shape.props.text}</Text>}
                 </Flex>
                 <Separator size='4' />

@@ -52,7 +52,7 @@ export class InternalLinkUtil extends ShapeUtil<IInternalLink> {
         }
     }
 
-    override canEdit = () => false
+    override canEdit = () => true
     override canResize = () => true
     override isAspectRatioLocked = () => false
 
@@ -69,6 +69,7 @@ export class InternalLinkUtil extends ShapeUtil<IInternalLink> {
     }
 
     component(shape: IInternalLink) {
+        const isEditing = this.editor.getEditingShapeId() === shape.id
 
         const Icon = ({
             'web': PaperClipIcon,
@@ -76,11 +77,29 @@ export class InternalLinkUtil extends ShapeUtil<IInternalLink> {
             'document': DocumentTextIcon
         }[shape.props.kind] ?? PaperClipIcon)
 
-        return <HTMLContainer className='rounded-md bg-zinc-800 p-3 font-sans'>
-            <Flex gap="4" align={"center"}>
+        const updateText = (e: HTMLInputElement) => {
+            this.editor.updateShape({
+                id: shape.id,
+                type: 'page-bookmark-shape',
+                props: {
+                    text: (e as HTMLInputElement)?.value ?? shape.props.text
+                }
+            })
+            isEditing && this.editor.complete()
+        }
+
+        const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (ev) => {
+            if (ev.key === 'Enter') {
+                updateText(ev.target as HTMLInputElement)
+            }
+        }
+
+        return <HTMLContainer className='rounded-md bg-zinc-800 p-3 font-sans' style={{pointerEvents: 'all'}}>
+            <Flex gap="4" align={"center"} justify={"center"}>
                 <ArrowRightIcon className='size-5 text-zinc-500'></ArrowRightIcon>
                 <Icon className='size-5'></Icon>
-                <Link onPointerDown={_ => _.stopPropagation()} style={{pointerEvents: 'all'}} href={shape.props.url}>{shape.props.text}</Link>
+                { !isEditing ? <Link onPointerDown={_ => _.stopPropagation()} style={{pointerEvents: 'all'}} href={shape.props.url}>{shape.props.text}</Link> :
+                    <TextField.Root className='w-full h-full' onKeyDown={handleKeyDown} onBlur={e => updateText(e.target)} size='1' onPointerDown={_ => _.stopPropagation()} defaultValue={shape.props.text}></TextField.Root> }
             </Flex>
         </HTMLContainer>
     }
