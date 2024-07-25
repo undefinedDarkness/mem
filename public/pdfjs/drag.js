@@ -1,78 +1,86 @@
-let initializedDefaultFile = false
-document.addEventListener("DOMContentLoaded", function () {
+let initializedDefaultFile = false;
+
+document.addEventListener("DOMContentLoaded", initializePDFViewer);
+
+async function initializePDFViewer() {
     console.log(`[pdf-iframe] Web Viewer Loaded`);
-    PDFViewerApplication.downloadOrSave = onSave
-    PDFViewerApplication.initializedPromise.then(async () => {
-        // This function is called whenever a new PDF is opened!
+    PDFViewerApplication.downloadOrSave = onSave;
+    await PDFViewerApplication.initializedPromise;
+    console.log(`[pdf-iframe] New PDF initialized!`);
+    notifyParentPDFReady();
+    PDFViewerApplication.eventBus.on('pagesinit', handlePagesInit);
+}
 
-        /** @type {import("./web/viewer.mjs").PDFViewerApplication} */
-        const app = PDFViewerApplication
+function notifyParentPDFReady() {
+    window.top.postMessage({ id: 'pdf-ready-for-data' }, '*');
+}
 
-        console.log(`[pdf-iframe] New PDF initialized!`);
-        window.top.postMessage({ id: 'pdf-ready-for-data' }, '*')
+function handlePagesInit() {
+    notifyParentPDFLoaded();
+    addPageDragHandlers();
+}
 
-        app.eventBus.on('pagesinit', () => {
-            if (initializedDefaultFile) {
-                window.top.postMessage({ id: `pdf-loaded-new` }, '*')
-            } else {
-                initializedDefaultFile = true;
-            }
-            for (const pageEl of document.querySelectorAll('.page')) {
-                let canvasElem = undefined
-                //  = pageEl.querySelector('canvas')
-                pageEl.addEventListener('dragstart', (_evt) => {
-                    canvasElem = pageEl.querySelector('canvas')
-                    const pageNo = parseInt(pageEl.getAttribute('data-page-number'))
-                    _evt.dataTransfer.setDragImage(canvasElem, 50, 50)
-                    _evt.dataTransfer.setData('custom/pdf-page', JSON.stringify({
-                        dataUrl: canvasElem.toDataURL(),
-                        pageNo: pageNo,
-                        width: parseInt(canvasElem.getAttribute('width')),
-                        height: parseInt(canvasElem.getAttribute('height')),
-                    }))
-                    const documentWorkspacePath = window.documentWorkspacePath
-                    const newUrl = new URL(window.top.location.href);
-                    newUrl.searchParams.set('documentWorkspacePath', documentWorkspacePath)
-                    newUrl.searchParams.set('documentPageNo', pageNo);
-                    _evt.dataTransfer.setData('custom/link-insert', JSON.stringify({
-                        name: app.documentInfo['Title']?.trim() ?? documentWorkspacePath.split('/').pop(),
-                        url: newUrl,
-                        kind: 'document',
-                    }))
-                })
-                pageEl.setAttribute("draggable", "true")
-            }
-        })
-    })
+function notifyParentPDFLoaded() {
+    if (initializedDefaultFile) {
+        window.top.postMessage({ id: 'pdf-loaded-new' }, '*');
+    } else {
+        initializedDefaultFile = true;
+    }
+}
 
-});
+function addPageDragHandlers() {
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(pageEl => {
+        pageEl.addEventListener('dragstart', createDragHandler(pageEl));
+        pageEl.setAttribute("draggable", "true");
+    });
+}
+
+function createDragHandler(pageEl) {
+    return (event) => {
+        const canvasElem = pageEl.querySelector('canvas');
+        const pageNo = parseInt(pageEl.getAttribute('data-page-number'));
+        const { width, height } = canvasElem;
+        const dataUrl = canvasElem.toDataURL();
+
+        event.dataTransfer.setDragImage(canvasElem, 50, 50);
+        event.dataTransfer.setData('custom/pdf-page', JSON.stringify({ dataUrl, pageNo, width, height }));
+        event.dataTransfer.setData('custom/link-insert', JSON.stringify(createLinkInsertData(pageNo)));
+    };
+}
+
+function createLinkInsertData(pageNo) {
+    const newUrl = new URL(window.top.location.href);
+    newUrl.searchParams.set('documentWorkspacePath', window.documentWorkspacePath);
+    newUrl.searchParams.set('documentPageNo', pageNo);
+
+    return {
+        name: PDFViewerApplication.documentInfo['Title']?.trim() ?? window.documentWorkspacePath.split('/').pop(),
+        url: newUrl.toString(),
+        kind: 'document',
+    };
+}
 
 async function onSave() {
-    if (PDFViewerApplication._saveInProgress) {
-        return;
-    }
+    if (PDFViewerApplication._saveInProgress) return;
+
     PDFViewerApplication._saveInProgress = true;
-    await PDFViewerApplication.pdfScriptingManager.dispatchWillSave();
-    const url = PDFViewerApplication._downloadUrl;
-    const filename = PDFViewerApplication._docFilename;
     try {
-        PDFViewerApplication._ensureDownloadComplete();
-        /** @type Uint8Array */
-        const data = await PDFViewerApplication.pdfDocument.saveDocument();
-        // const blob = new Blob([data], {
-        //   type: "application/pdf",
-        // });
+        await PDFViewerApplication.pdfScriptingManager.dispatchWillSave();
+        const { data } = await PDFViewerApplication.pdfDocument.saveDocument();
+        const documentName = PDFViewerApplication.documentInfo['Title']?.trim() ?? window.documentWorkspacePath.split('/').pop();
+
         console.log('[pdf-iframe] Sending data to parent for save o/p');
         window.top.postMessage({
-            id: 'pdf-save-pdf', data: {
+            id: 'pdf-save-pdf',
+            data: {
                 blob: data,
-                documentName: PDFViewerApplication.documentInfo['Title']?.trim() ?? window.documentWorkspacePath.split('/').pop(),
+                documentName,
                 documentWorkspacePath: window.documentWorkspacePath
             }
-        }, '*', [data.buffer])
-
-    } catch (reason) {
-        console.error(`Error when saving the document: ${reason.message}`);
+        }, '*', [data.buffer]);
+    } catch (error) {
+        console.error(`Error when saving the document: ${error.message}`);
         await PDFViewerApplication.download({});
     } finally {
         await PDFViewerApplication.pdfScriptingManager.dispatchDidSave();
@@ -80,7 +88,8 @@ async function onSave() {
     }
 }
 
-window.addEventListener('message', (ev) => {
-    if (ev.data == 'pdf-want-download')
-        PDFViewerApplication.download({})
-})
+window.addEventListener('message', (event) => {
+    if (event.data === 'pdf-want-download') {
+        PDFViewerApplication.download({});
+    }
+});
