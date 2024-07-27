@@ -21,7 +21,7 @@ import { IconButton, Text, TextField } from '@radix-ui/themes';
 import { PinBottomIcon, ArrowTopRightIcon, DownloadIcon } from '@radix-ui/react-icons';
 import { getWorkspaceDirectory, FileHandleWithPath } from '@/utils/db';
 import { debounce } from 'tldraw';
-import { getFileHandleFromPath, toReadableStream } from '@/utils/fs';
+import { getHandleFromPath, toReadableStream } from '@/utils/fs';
 import humanId from 'human-id';
 
 const SaveLocationUI = ({ saveFilePath, setSaveFilePath, className, ...props }: { saveFilePath: FileHandleWithPath, setSaveFilePath: (path: FileHandleWithPath) => void, className: string }) => {
@@ -77,7 +77,7 @@ const SaveStateLocally = ({ saveFilePath }: { saveFilePath: FileHandleWithPath }
     const onVisibilityChanged = (async () => {
       if (document.visibilityState != "hidden" || !editor || editor.isEmpty || !saveFilePath.path) return
       const content = editor.getJSON()
-      const fileHandle = saveFilePath.handle ?? await getFileHandleFromPath(saveFilePath.path, undefined, true)
+      const fileHandle = saveFilePath.handle ?? (await getHandleFromPath(saveFilePath.path, undefined, true)).handle!
       const writable = await fileHandle.createWritable()
       toast.promise(toReadableStream(JSON.stringify(content))
         .pipeThrough(new TextEncoderStream())

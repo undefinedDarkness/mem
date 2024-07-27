@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useRef, useState } from "react";
 import { getWorkspaceDirectory } from "../../utils/db";
-import { getFileHandleFromPath, toReadableStream } from "../../utils/fs";
+import { getHandleFromPath, toReadableStream } from "../../utils/fs";
 import toast from "react-hot-toast";
 import { ArrowTopRightIcon, FileIcon } from "@radix-ui/react-icons";
 import { Button, Text } from "@radix-ui/themes";
@@ -16,14 +16,14 @@ export default function PDFWindow(props: object) {
     const [iframeReadyForData, setIframeReadyForData] = useState(false);
 
     const writeToFileSystem = async ({ blob, documentWorkspacePath, documentName }: { blob: Uint8Array, documentWorkspacePath: string, documentName: string }) => {
-        const dir = await getWorkspaceDirectory()
-        if (!dir?.handle || !documentWorkspacePath) {
-            throw new Error(`[pdf] Encountered invalid handle or empty path while saving ${dir?.handle} ${documentWorkspacePath}`)
-        }
+        // const dir = await getWorkspaceDirectory()
+        // if (!dir?.handle || !documentWorkspacePath) {
+        //     throw new Error(`[pdf] Encountered invalid handle or empty path while saving ${dir?.handle} ${documentWorkspacePath}`)
+        // }
         console.log(`[pdf] Saving file ${documentWorkspacePath}`)
         // iframe?.current?.contentWindow?.postMessage('pdf-want-download', '*')
-        const file = await getFileHandleFromPath(documentWorkspacePath, dir.handle)
-        const writable = await file.createWritable()
+        const { fileHandle } = await getHandleFromPath(documentWorkspacePath)
+        const writable = await fileHandle!.createWritable()
         toast.promise(toReadableStream(blob).pipeTo(writable), {
             error: `[pdf] Failed to write to ${documentWorkspacePath}`,
             success: `[pdf] Wrote to ${documentWorkspacePath}`,
@@ -94,7 +94,7 @@ export default function PDFWindow(props: object) {
         const documentWorkspacePath = urlParams.get('documentWorkspacePath')
         if (!documentWorkspacePath) return
         (async () => {
-            setPageParams({ pageNo: Number(urlParams.get('documentPageNo') ?? '1'), pageBlob: await (await getFileHandleFromPath(documentWorkspacePath)).getFile(), pagePath: documentWorkspacePath })
+            setPageParams({ pageNo: Number(urlParams.get('documentPageNo') ?? '1'), pageBlob: await (await getHandleFromPath(documentWorkspacePath)).getFile(), pagePath: documentWorkspacePath })
         })()
         clearUrlParam(['documentWorkspacePath', 'documentPageNo'], router)
     }, [urlParams])

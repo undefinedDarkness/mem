@@ -36,15 +36,17 @@ export default function Home() {
 
     initBroadcastChannel()
 
-    return () => {}
+    return () => { }
   }, [])
 
 
 
-  return (
+  return (<>
     <main>
+      {/* <PrimeReactProvider> */}
       <LayoutContainer layout="sidepanel" mainCanvas={<CanvasEditor workspaceId={workspaceId} setEditor={setEditor}></CanvasEditor>} sideBar={<Sidebar workspaceId={workspaceId!} editor={editor}></Sidebar>}></LayoutContainer>
       <Toaster position="bottom-left"></Toaster>
+      {/* </PrimeReactProvider> */}
     </main>
-  );
+  </>);
 }

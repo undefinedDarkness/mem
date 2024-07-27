@@ -24,8 +24,8 @@ export function Sidebar({ workspaceId, editor }: { workspaceId: string, editor: 
                 <Tabs.Trigger value="actions"><Cog8ToothIcon className="size-5"></Cog8ToothIcon></Tabs.Trigger> */}
             </Tabs.List>
 
-            <Box className="h-full">
-                <Tabs.Content value="files" className="p-4 data-[state=inactive]:hidden">
+            <Box>
+                <Tabs.Content value="files" className="max-h-full data-[state=inactive]:hidden">
                     <Files workspaceId={workspaceId}></Files>
                 </Tabs.Content>
                 <Tabs.Content value="bookmarks">

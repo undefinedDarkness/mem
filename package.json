@@ -22,6 +22,7 @@
     "@tiptap/react": "^2.4.0",
     "@tiptap/starter-kit": "^2.4.0",
     "allotment": "^1.20.2",
+    "bootstrap-icons": "^1.11.3",
     "cheerio": "^1.0.0-rc.12",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",

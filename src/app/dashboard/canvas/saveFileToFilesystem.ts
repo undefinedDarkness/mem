@@ -1,5 +1,5 @@
 import { getWorkspaceDirectory } from "@/utils/db";
-import { getFileHandleFromPath } from "@/utils/fs";
+import { getHandleFromPath } from "@/utils/fs";
 import { nanoid } from "nanoid";
 import { TLAssetId, AssetRecordType, getHashForString, MediaHelpers, TLAsset } from "tldraw";
 
@@ -8,8 +8,8 @@ async function saveFile(file: File) {
     const id = nanoid()
     const objectName = `${id}-${file.name}`.replaceAll(/[^a-zA-Z0-9.]/g, '-')
 
-    const fsFile = await getFileHandleFromPath(`assets/${objectName}`, undefined, true)
-    await fsFile.createWritable().then(writer => {
+    const { fileHandle } = await getHandleFromPath(`assets/${objectName}`, undefined, true)
+    await fileHandle!.createWritable().then(writer => {
         file.stream()
             .pipeTo(writer)
     })
