@@ -1,8 +1,8 @@
 'use client'
-import { Tree, TreeDragDropEvent, TreePassThroughOptions } from 'primereact/tree'
+import { Tree, TreeDragDropEvent, TreeNodeTemplateOptions, TreePassThroughOptions, TreeTogglerTemplateOptions } from 'primereact/tree'
 import { TreeNode } from 'primereact/treenode'
 import { useMountEffect } from 'primereact/hooks'
-import { useState } from 'react'
+import { DragEvent, DragEventHandler, useState } from 'react'
 import { getWorkspaceDirectory } from '@/utils/db'
 
 import 'bootstrap-icons/font/bootstrap-icons.css'
@@ -66,7 +66,6 @@ const treeStyling: TreePassThroughOptions = {
     searchIcon: { className: '' }
 }
 
-
 export default function Files() {
     const [nodes, setNodes] = useState<TreeNode[]>()
 
@@ -76,7 +75,7 @@ export default function Files() {
         })
     })
 
-    const onDrop = async (e: TreeDragDropEvent) => {
+    const onTreeDND = async (e: TreeDragDropEvent) => {
         
         const dragHandle = await (e.dragNode as TreeNodeEx).handle
         const dropHandle = await (e.dropNode as TreeNodeEx).handle
@@ -94,6 +93,6 @@ export default function Files() {
     }
 
     return <>
-        <Tree filter filterMode='lenient' dragdropScope='fileTree' onDragDrop={onDrop} expandIcon={'bi bi-folder2 text-xl'} collapseIcon={'bi bi-folder2-open text-xl'} value={nodes} className='max-h-[96vh] overflow-y-auto' pt={treeStyling}></Tree>
+        <Tree filter filterMode='lenient' dragdropScope='fileTree' onDragDrop={onTreeDND} expandIcon={'bi bi-folder2 text-xl'} collapseIcon={'bi bi-folder2-open text-xl'} value={nodes} className='max-h-[96vh] overflow-y-auto' pt={treeStyling}></Tree>
     </>
 }

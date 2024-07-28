@@ -1,5 +1,5 @@
 'use client'
-import { debounce, Tldraw, Editor, TLUiOverrides, TLUiComponents, TLEditorComponents, useTools, DefaultToolbar, TldrawUiMenuItem, useIsToolSelected, DefaultToolbarContent, createShapeId, useEditor, TLPageId, LineToolbarItem, TLUiAssetUrlOverrides } from "tldraw";
+import { debounce, Tldraw, Editor, TLUiOverrides, TLUiComponents, TLEditorComponents, useTools, DefaultToolbar, TldrawUiMenuItem, useIsToolSelected, DefaultToolbarContent, createShapeId, useEditor, TLPageId, LineToolbarItem, TLUiAssetUrlOverrides, throttle } from "tldraw";
 import { useCallback, useEffect } from 'react'
 import { createAssetFromUrl } from "./createAssetFromUrl";
 import { handleDropEvents } from "./handleDropEvents";
@@ -133,6 +133,7 @@ export default function CanvasEditor({ workspaceId, setEditor, ...props }: { wor
     editor.registerExternalAssetHandler('url', createAssetFromUrl)
     editor.registerExternalAssetHandler('file', saveFileToFilesystem)
 
+    // TODO: This function is called repeatedly, for whatever reason, try to prevent that somehow
     const fn = (ev: DragEvent) => handleDropEvents(ev, editor)
     editor.getContainer().addEventListener('drop', fn)
     setEditor(editor)

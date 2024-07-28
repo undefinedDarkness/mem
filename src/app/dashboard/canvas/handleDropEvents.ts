@@ -1,12 +1,20 @@
 import { AssetRecordType, Editor } from "tldraw"
 import { LinkInsert } from "../sidebar/bookmarks"
 
-export const handleDropEvents = (ev: DragEvent, editor: Editor) => {
+function displayDataTransfer(d: DataTransfer) {
+  const r: Record<string, string> = {  }
+  for (const t of d.types) {
+    r[t] = d.getData(t)
+  }
+  return r
+}
 
+export const handleDropEvents = (ev: DragEvent, editor: Editor) => {
+  ev.stopImmediatePropagation()
   const eventPoint = editor.screenToPage({ x: ev.clientX, y: ev.clientY })
 
   console.log(`[editor] got dropped on!`)
-  console.log(ev.dataTransfer)
+  console.log(displayDataTransfer(ev.dataTransfer!))
     const pdfPage = ev.dataTransfer?.getData("custom/pdf-page")
     // console.log(ev.dataTransfer?.getData('text/plain'))
     // console.log(pdfPage)
